@@ -1,0 +1,51 @@
+[
+  {
+    "scientificName": "Bellis perennis",
+    "commonName": "Common daisy",
+    "family": "Asteraceae",
+    "rarity": "common",
+    "description": "A small, ubiquitous European lawn flower with white ray florets and a yellow disc."
+  },
+  {
+    "scientificName": "Taraxacum officinale",
+    "commonName": "Dandelion",
+    "family": "Asteraceae",
+    "rarity": "common",
+    "description": "Deep tap-rooted pioneer species; every part of the plant is edible."
+  },
+  {
+    "scientificName": "Urtica dioica",
+    "commonName": "Stinging nettle",
+    "family": "Urticaceae",
+    "rarity": "common",
+    "description": "Host plant for peacock and small tortoiseshell butterflies."
+  },
+  {
+    "scientificName": "Trifolium repens",
+    "commonName": "White clover",
+    "family": "Fabaceae",
+    "rarity": "common",
+    "description": "Nitrogen-fixing legume, critical to pollinators in urban lawns."
+  },
+  {
+    "scientificName": "Geranium robertianum",
+    "commonName": "Herb-Robert",
+    "family": "Geraniaceae",
+    "rarity": "uncommon",
+    "description": "Reddish-stemmed street-crack inhabitant with a distinctive musky scent."
+  },
+  {
+    "scientificName": "Digitalis purpurea",
+    "commonName": "Foxglove",
+    "family": "Plantaginaceae",
+    "rarity": "rare",
+    "description": "Tall spire of tubular flowers; highly toxic, medicinally important."
+  },
+  {
+    "scientificName": "Orchis mascula",
+    "commonName": "Early purple orchid",
+    "family": "Orchidaceae",
+    "rarity": "legendary",
+    "description": "A rare sight in urban settings; appears briefly in spring."
+  }
+]
