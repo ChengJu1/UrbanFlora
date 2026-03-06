@@ -1,0 +1,13 @@
+/// Copy this file to `api_keys.dart` and fill in your own keys.
+/// `api_keys.dart` is git-ignored, `api_keys.dart.example` is not.
+library;
+
+class ApiKeys {
+  const ApiKeys._();
+
+  /// Pl@ntNet API key, register at https://my.plantnet.org
+  static const String plantNet = 'YOUR_PLANTNET_API_KEY';
+
+  /// OpenWeatherMap API key, register at https://openweathermap.org/api
+  static const String openWeather = 'YOUR_OPENWEATHER_API_KEY';
+}
