@@ -1,0 +1,22 @@
+// Firestore security rules for UrbanFlora.
+// Deploy with:  firebase deploy --only firestore:rules
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // A user can only touch their own profile document and sub-observations.
+    match /users/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+
+      match /observations/{obsId} {
+        allow read, write: if request.auth != null && request.auth.uid == uid;
+      }
+    }
+
+    // Species catalog is read-only for clients; only admin tooling writes here.
+    match /species/{scientificName} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+  }
+}
