@@ -18,5 +18,16 @@ service cloud.firestore {
       allow read: if request.auth != null;
       allow write: if false;
     }
+
+    // Public sightings power the community map: every signed-in user can
+    // read them, but only the owner can create / edit / delete their own.
+    // The owner is identified by `ownerUid`, which must match the auth uid.
+    match /public_sightings/{id} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null
+                    && request.resource.data.ownerUid == request.auth.uid;
+      allow update, delete: if request.auth != null
+                            && resource.data.ownerUid == request.auth.uid;
+    }
   }
 }

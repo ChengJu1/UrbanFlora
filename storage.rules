@@ -4,9 +4,10 @@ rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
     match /users/{uid}/observations/{obsId} {
-      // Only the owner can read or write their own observation photos.
-      // Limit uploads to reasonable JPEGs to curb abuse of the free tier.
-      allow read: if request.auth != null && request.auth.uid == uid;
+      // Any signed-in user can read observation photos so the community
+      // map can show pins published by other naturalists. Writes stay
+      // owner-only, with size/type guards to discourage abuse.
+      allow read: if request.auth != null;
       allow write: if request.auth != null
                    && request.auth.uid == uid
                    && request.resource.size < 8 * 1024 * 1024
