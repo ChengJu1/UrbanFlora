@@ -22,24 +22,23 @@ if you log at least one plant a week).
 
 ## Screens
 
-Screenshots live in `docs/screenshots/`. A short demo gif is at
-`docs/screenshots/demo.gif`.
+A short demo gif is at `docs/screenshots/demo.gif`.
 
 | Splash | Onboarding (1/3) | Onboarding (2/3) | Onboarding (3/3) |
 |---|---|---|---|
-| `01_splash.jpg` | `02_onboarding_a.jpg` | `03_onboarding_b.jpg` | `04_onboarding_c.jpg` |
+| <img src="docs/screenshots/01_splash.jpg" width="200"> | <img src="docs/screenshots/02_onboarding_a.jpg" width="200"> | <img src="docs/screenshots/03_onboarding_b.jpg" width="200"> | <img src="docs/screenshots/04_onboarding_c.jpg" width="200"> |
 
 | Sign in | Home | Camera | Identify |
 |---|---|---|---|
-| `05_signin.jpg` | `06_home.jpg` | `07_camera.jpg` | `08_identify.jpg` |
+| <img src="docs/screenshots/05_signin.jpg" width="200"> | <img src="docs/screenshots/06_home.jpg" width="200"> | <img src="docs/screenshots/07_camera.jpg" width="200"> | <img src="docs/screenshots/08_identify.jpg" width="200"> |
 
 | Achievement | Detail | Daily digest | My map |
 |---|---|---|---|
-| `09_achievement.jpg` | `10_detail.jpg` | `11_digest.jpg` | `12_map_mine.jpg` |
+| <img src="docs/screenshots/09_achievement.jpg" width="200"> | <img src="docs/screenshots/10_detail.jpg" width="200"> | <img src="docs/screenshots/11_digest.jpg" width="200"> | <img src="docs/screenshots/12_map_mine.jpg" width="200"> |
 
 | Community map | Codex | Settings |
 |---|---|---|
-| `13_map_community.jpg` | `14_codex.jpg` | `15_settings.jpg` |
+| <img src="docs/screenshots/13_map_community.jpg" width="200"> | <img src="docs/screenshots/14_codex.jpg" width="200"> | <img src="docs/screenshots/15_settings.jpg" width="200"> |
 
 ## How it's put together
 
