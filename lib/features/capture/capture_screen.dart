@@ -10,8 +10,8 @@ import '../../core/services/location_service.dart';
 import '../../shared/widgets/compass_overlay.dart';
 import '../identification/identification_args.dart';
 
-/// Camera capture screen with flash, lens-flip, gallery import and an
-/// optional compass overlay. Hands the chosen photo to identification.
+/// Camera screen — flash, flip lens, gallery import, compass overlay.
+/// Hands the photo to the identify screen.
 class CaptureScreen extends ConsumerStatefulWidget {
   const CaptureScreen({super.key});
 
@@ -195,16 +195,30 @@ class _CameraPreviewArea extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
-    final deviceRatio = size.width / size.height;
-    final previewRatio = controller.value.aspectRatio;
-    final scale = previewRatio / deviceRatio;
+    final isPortrait = size.height >= size.width;
+    final previewRatio = isPortrait
+        ? 1 / controller.value.aspectRatio
+        : controller.value.aspectRatio;
+    final screenRatio = size.width / size.height;
 
-    return Transform.scale(
-      scale: scale < 1 ? 1 / scale : scale,
-      alignment: Alignment.center,
-      child: Center(
-        child: AspectRatio(
-          aspectRatio: previewRatio,
+    final double coverW;
+    final double coverH;
+    if (screenRatio < previewRatio) {
+      coverH = size.height;
+      coverW = coverH * previewRatio;
+    } else {
+      coverW = size.width;
+      coverH = coverW / previewRatio;
+    }
+
+    return ClipRect(
+      child: OverflowBox(
+        alignment: Alignment.center,
+        maxWidth: double.infinity,
+        maxHeight: double.infinity,
+        child: SizedBox(
+          width: coverW,
+          height: coverH,
           child: CameraPreview(controller),
         ),
       ),
