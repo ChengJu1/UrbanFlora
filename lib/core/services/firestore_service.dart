@@ -165,16 +165,18 @@ class FirestoreService {
 final firestoreServiceProvider =
     Provider<FirestoreService>((_) => FirestoreService());
 
-final userProfileProvider = StreamProvider.family<UserProfile, String>((ref, uid) {
+// autoDispose so signing out drops the old listeners
+final userProfileProvider =
+    StreamProvider.autoDispose.family<UserProfile, String>((ref, uid) {
   return ref.watch(firestoreServiceProvider).profileStream(uid);
 });
 
 final recentObservationsProvider =
-    StreamProvider.family<List<Observation>, String>((ref, uid) {
+    StreamProvider.autoDispose.family<List<Observation>, String>((ref, uid) {
   return ref.watch(firestoreServiceProvider).recentObservations(uid);
 });
 
 final recentPublicSightingsProvider =
-    StreamProvider<List<PublicSighting>>((ref) {
+    StreamProvider.autoDispose<List<PublicSighting>>((ref) {
   return ref.watch(firestoreServiceProvider).recentPublicSightings();
 });
