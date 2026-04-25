@@ -114,7 +114,10 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
             )
           : await auth.signInWithEmail(email: email, password: password);
       if (user != null && _registerMode) {
-        await ref.read(firestoreServiceProvider).updateNickname(
+        // create the firestore profile doc with the chosen nickname BEFORE
+        // we let the navigation listener jump to home, so the home greeting
+        // never flashes the default "Botanist #xxxx" name
+        await ref.read(firestoreServiceProvider).createProfile(
               uid: user.uid,
               nickname: nickname,
             );
@@ -128,10 +131,12 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     final auth = ref.read(authServiceProvider);
     final scheme = Theme.of(context).colorScheme;
 
-    // already signed in -> jump straight to home
+    // already signed in -> jump straight to home (but not while we're in
+    // the middle of registering — _go does its own navigation once the
+    // firestore profile is fully written)
     ref.listen(authStateProvider, (_, next) {
       next.whenData((user) {
-        if (user != null && mounted) context.go(AppRoutes.home);
+        if (user != null && mounted && !_busy) context.go(AppRoutes.home);
       });
     });
     if (auth == null) {

@@ -35,13 +35,17 @@ class FirestoreService {
   }
 
   /// Get the profile, or make a fresh one if it doesn't exist yet.
+  /// Wrapped in a transaction so we never clobber a nickname that another
+  /// write (e.g. registerWithEmail / updateNickname) just set in parallel.
   Future<UserProfile> ensureProfile(String uid) async {
     final ref = _userDoc(uid);
-    final snap = await ref.get();
-    if (snap.exists) return UserProfile.fromSnapshot(snap);
-    final initial = UserProfile.initial(uid);
-    await ref.set(initial.toMap());
-    return initial;
+    return _db.runTransaction<UserProfile>((tx) async {
+      final snap = await tx.get(ref);
+      if (snap.exists) return UserProfile.fromSnapshot(snap);
+      final initial = UserProfile.initial(uid);
+      tx.set(ref, initial.toMap());
+      return initial;
+    });
   }
 
   Future<void> updateNickname({
@@ -52,6 +56,30 @@ class FirestoreService {
       {'nickname': nickname.trim()},
       SetOptions(merge: true),
     );
+  }
+
+  /// Create a fresh profile doc for a newly-registered user. If a doc is
+  /// somehow already there, just merges the chosen nickname in instead of
+  /// clobbering the rest.
+  Future<void> createProfile({
+    required String uid,
+    required String nickname,
+  }) async {
+    final clean = nickname.trim();
+    final ref = _userDoc(uid);
+    await _db.runTransaction((tx) async {
+      final snap = await tx.get(ref);
+      if (snap.exists) {
+        if (clean.isNotEmpty) {
+          tx.set(ref, {'nickname': clean}, SetOptions(merge: true));
+        }
+        return;
+      }
+      final initial = UserProfile.initial(uid).copyWith(
+        nickname: clean.isEmpty ? null : clean,
+      );
+      tx.set(ref, initial.toMap());
+    });
   }
 
   // ---- observations ----
