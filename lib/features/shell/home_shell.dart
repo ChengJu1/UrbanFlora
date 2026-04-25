@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/services/nearby_rare_watcher.dart';
 import '../../shared/widgets/draggable_spot_button.dart';
 
 /// Bottom-nav scaffold with three tabs + a floating draggable Spot button.
-class HomeShell extends StatelessWidget {
+class HomeShell extends ConsumerWidget {
   const HomeShell({required this.navigationShell, super.key});
 
   final StatefulNavigationShell navigationShell;
@@ -17,7 +19,10 @@ class HomeShell extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // just watching keeps the rare-bloom watcher alive
+    ref.watch(nearbyRareWatcherProvider);
+
     return Scaffold(
       body: Stack(
         children: [

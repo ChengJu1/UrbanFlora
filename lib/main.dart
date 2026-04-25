@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app.dart';
+import 'core/services/notifications_service.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
@@ -18,6 +19,13 @@ Future<void> main() async {
     await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   } on Object catch (_) {
     debugPrint('[UrbanFlora] Firebase not configured yet — see README.');
+  }
+
+  // set up local notifications (used for rare bloom alerts)
+  try {
+    await NotificationsService().init();
+  } on Object catch (e) {
+    debugPrint('[UrbanFlora] notifications init failed: $e');
   }
 
   runApp(const ProviderScope(child: UrbanFloraApp()));
