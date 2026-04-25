@@ -36,6 +36,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   MapMode _mode = MapMode.mine;
   GeoFix? _userFix;
   bool _fetchingLocation = false;
+  bool _showAllCommunity = false;
 
   // which rarity chips are on
   Set<Rarity> _rarityFilter = Set<Rarity>.of(Rarity.values);
@@ -77,6 +78,28 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     });
   }
 
+  void _toggleScope() {
+    setState(() => _showAllCommunity = !_showAllCommunity);
+  }
+
+  Future<void> _refresh() async {
+    final uid = ref.read(authStateProvider).valueOrNull?.uid;
+    if (_mode == MapMode.mine && uid != null) {
+      ref.invalidate(recentObservationsProvider(uid));
+    } else {
+      ref.invalidate(recentPublicSightingsProvider);
+      // also re-grab GPS in case we moved
+      await _ensureLocation(force: true);
+    }
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Refreshing…'),
+        duration: Duration(seconds: 1),
+      ),
+    );
+  }
+
   void _fitToPoints(List<LatLng> points) {
     if (points.isEmpty) return;
     final bounds = LatLngBounds.fromPoints(points);
@@ -102,11 +125,23 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         title: Text(
           _mode == MapMode.mine ? 'Your map' : 'Community map',
         ),
+        actions: [
+          IconButton(
+            tooltip: 'Refresh',
+            onPressed: _refresh,
+            icon: const Icon(Icons.refresh),
+          ),
+        ],
       ),
       body: Stack(
         children: [
           if (_mode == MapMode.mine)
-            _MineLayer(uid: uid, controller: _map, onFit: _fitToPoints)
+            _MineLayer(
+              uid: uid,
+              controller: _map,
+              onFit: _fitToPoints,
+              onRefresh: _refresh,
+            )
           else
             _CommunityLayer(
               fix: _userFix,
@@ -115,6 +150,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               onFit: _fitToPoints,
               rarityFilter: _rarityFilter,
               onToggleRarity: _toggleRarity,
+              showAll: _showAllCommunity,
+              onToggleScope: _toggleScope,
+              onRefresh: _refresh,
             ),
           Positioned(
             right: 16,
@@ -161,10 +199,12 @@ class _MineLayer extends ConsumerWidget {
     required this.uid,
     required this.controller,
     required this.onFit,
+    required this.onRefresh,
   });
   final String uid;
   final MapController controller;
   final ValueChanged<List<LatLng>> onFit;
+  final VoidCallback onRefresh;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -230,6 +270,7 @@ class _MineLayer extends ConsumerWidget {
                 onFit: () => onFit([
                   for (final o in located) LatLng(o.latitude!, o.longitude!),
                 ]),
+                onRefresh: onRefresh,
               ),
             ),
           ],
@@ -247,7 +288,7 @@ class _MineLayer extends ConsumerWidget {
   }
 }
 
-// everyone's pins (within 10 km)
+// everyone's pins (within 10 km, or worldwide)
 class _CommunityLayer extends ConsumerWidget {
   const _CommunityLayer({
     required this.fix,
@@ -256,6 +297,9 @@ class _CommunityLayer extends ConsumerWidget {
     required this.onFit,
     required this.rarityFilter,
     required this.onToggleRarity,
+    required this.showAll,
+    required this.onToggleScope,
+    required this.onRefresh,
   });
   final GeoFix? fix;
   final bool fetching;
@@ -263,6 +307,9 @@ class _CommunityLayer extends ConsumerWidget {
   final ValueChanged<List<LatLng>> onFit;
   final Set<Rarity> rarityFilter;
   final ValueChanged<Rarity> onToggleRarity;
+  final bool showAll;
+  final VoidCallback onToggleScope;
+  final VoidCallback onRefresh;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -277,18 +324,21 @@ class _CommunityLayer extends ConsumerWidget {
             ? null
             : LatLng(fix!.latitude, fix!.longitude);
 
-        final nearby = (origin == null
-                ? all
-                : all
-                    .where((s) =>
-                        _haversineMetres(
-                          origin.latitude,
-                          origin.longitude,
-                          s.latitude,
-                          s.longitude,
-                        ) <=
-                        AppConstants.communityRadiusMetres)
-                    .toList())
+        // when "show all" is on, skip the 10 km radius filter so any
+        // sighting on Earth still shows up
+        final inRange = (showAll || origin == null)
+            ? all
+            : all
+                .where((s) =>
+                    _haversineMetres(
+                      origin.latitude,
+                      origin.longitude,
+                      s.latitude,
+                      s.longitude,
+                    ) <=
+                    AppConstants.communityRadiusMetres)
+                .toList();
+        final nearby = inRange
             .where((s) => rarityFilter.contains(s.rarity))
             .toList(growable: false);
 
@@ -366,15 +416,20 @@ class _CommunityLayer extends ConsumerWidget {
                 children: [
                   _LegendBar(
                     count: nearby.length,
-                    label: 'nearby find',
+                    label: showAll ? 'find' : 'nearby find',
                     onFit: () => onFit([
-                      if (origin != null) origin,
+                      if (origin != null && !showAll) origin,
                       for (final s in nearby)
                         LatLng(s.latitude, s.longitude),
                     ]),
-                    trailing: 'within '
-                        '${(AppConstants.communityRadiusMetres / 1000).toStringAsFixed(0)} km',
+                    trailing: showAll
+                        ? 'worldwide'
+                        : 'within '
+                            '${(AppConstants.communityRadiusMetres / 1000).toStringAsFixed(0)} km',
+                    onRefresh: onRefresh,
                   ),
+                  const SizedBox(height: 8),
+                  _ScopeToggle(showAll: showAll, onToggle: onToggleScope),
                   const SizedBox(height: 8),
                   _RarityFilterBar(
                     selected: rarityFilter,
@@ -624,11 +679,13 @@ class _LegendBar extends StatelessWidget {
     required this.label,
     required this.onFit,
     this.trailing,
+    this.onRefresh,
   });
   final int count;
   final String label;
   final VoidCallback onFit;
   final String? trailing;
+  final VoidCallback? onRefresh;
 
   @override
   Widget build(BuildContext context) {
@@ -652,6 +709,13 @@ class _LegendBar extends StatelessWidget {
               ),
             ),
             const Spacer(),
+            if (onRefresh != null)
+              IconButton(
+                tooltip: 'Refresh',
+                onPressed: onRefresh,
+                icon: const Icon(Icons.refresh),
+                visualDensity: VisualDensity.compact,
+              ),
             IconButton(
               tooltip: 'Fit to view',
               onPressed: onFit,
@@ -659,6 +723,53 @@ class _LegendBar extends StatelessWidget {
               visualDensity: VisualDensity.compact,
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ScopeToggle extends StatelessWidget {
+  const _ScopeToggle({required this.showAll, required this.onToggle});
+  final bool showAll;
+  final VoidCallback onToggle;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Material(
+      color: scheme.surface.withValues(alpha: 0.92),
+      borderRadius: BorderRadius.circular(16),
+      elevation: 2,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: onToggle,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Row(
+            children: [
+              Icon(
+                showAll ? Icons.public : Icons.near_me_outlined,
+                size: 16,
+                color: scheme.primary,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  showAll
+                      ? 'Showing finds worldwide'
+                      : 'Showing finds within '
+                          '${(AppConstants.communityRadiusMetres / 1000).toStringAsFixed(0)} km',
+                  style: Theme.of(context).textTheme.labelLarge,
+                ),
+              ),
+              Switch(
+                value: showAll,
+                onChanged: (_) => onToggle(),
+                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+            ],
+          ),
         ),
       ),
     );
