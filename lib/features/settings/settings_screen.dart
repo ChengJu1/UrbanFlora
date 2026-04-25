@@ -17,7 +17,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   final _nicknameController = TextEditingController();
   bool _saving = false;
   bool _seeded = false;
+  bool _resyncing = false;
   String? _message;
+  String? _resyncMessage;
 
   @override
   void dispose() {
@@ -54,6 +56,41 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Future<void> _signOut() async {
     await ref.read(authServiceProvider)?.signOut();
     if (mounted) context.go(AppRoutes.signIn);
+  }
+
+  Future<void> _resyncCommunity(String uid) async {
+    setState(() {
+      _resyncing = true;
+      _resyncMessage = null;
+    });
+    final fs = ref.read(firestoreServiceProvider);
+    try {
+      final profile = await fs.ensureProfile(uid);
+      final observations = await fs.allObservations(uid);
+      var pushed = 0;
+      var skipped = 0;
+      for (final obs in observations) {
+        if (!obs.hasLocation) {
+          skipped += 1;
+          continue;
+        }
+        try {
+          await fs.publishSighting(obs: obs, capturerNickname: profile.nickname);
+          pushed += 1;
+        } on Object catch (e) {
+          debugPrint('[Settings] republish failed for ${obs.id}: $e');
+        }
+      }
+      if (!mounted) return;
+      setState(() => _resyncMessage =
+          'Re-shared $pushed find${pushed == 1 ? '' : 's'}'
+          '${skipped == 0 ? '' : ', skipped $skipped without GPS'}.');
+    } on Object catch (e) {
+      if (!mounted) return;
+      setState(() => _resyncMessage = 'Could not re-sync: $e');
+    } finally {
+      if (mounted) setState(() => _resyncing = false);
+    }
   }
 
   @override
@@ -106,6 +143,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   message: _message,
                   onSeeded: () => _seeded = true,
                   onSave: () => _save(uid),
+                ),
+                const SizedBox(height: 16),
+                _CommunitySyncCard(
+                  busy: _resyncing,
+                  message: _resyncMessage,
+                  onTap: () => _resyncCommunity(uid),
                 ),
                 const SizedBox(height: 24),
                 OutlinedButton.icon(
@@ -209,6 +252,66 @@ class _ProfileForm extends ConsumerWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class _CommunitySyncCard extends StatelessWidget {
+  const _CommunitySyncCard({
+    required this.busy,
+    required this.message,
+    required this.onTap,
+  });
+
+  final bool busy;
+  final String? message;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Community map',
+              style: Theme.of(context)
+                  .textTheme
+                  .titleLarge
+                  ?.copyWith(fontWeight: FontWeight.w800),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Re-publish all your saved finds. Useful if a photo failed to '
+              'reach the community map (network glitch, etc).',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: scheme.onSurfaceVariant,
+                  ),
+            ),
+            if (message != null) ...[
+              const SizedBox(height: 12),
+              Text(
+                message!,
+                style: TextStyle(color: scheme.primary),
+              ),
+            ],
+            const SizedBox(height: 16),
+            FilledButton.tonalIcon(
+              onPressed: busy ? null : onTap,
+              icon: busy
+                  ? const SizedBox.square(
+                      dimension: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.cloud_sync_outlined),
+              label: Text(busy ? 'Re-syncing...' : 'Re-share my finds'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

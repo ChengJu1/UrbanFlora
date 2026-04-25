@@ -73,6 +73,15 @@ class FirestoreService {
         .map((q) => q.docs.map(Observation.fromSnapshot).toList());
   }
 
+  /// One-shot read of every observation this user has saved. Used for things
+  /// like bulk republishing to the community map.
+  Future<List<Observation>> allObservations(String uid) async {
+    final q = await _observations(uid)
+        .orderBy('capturedAt', descending: true)
+        .get();
+    return q.docs.map(Observation.fromSnapshot).toList();
+  }
+
   // ---- community ----
 
   /// Push a public copy with coords rounded to ~10 m.

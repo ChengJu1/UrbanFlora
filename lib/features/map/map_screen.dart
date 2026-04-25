@@ -416,6 +416,7 @@ class _CommunityLayer extends ConsumerWidget {
                 children: [
                   _LegendBar(
                     count: nearby.length,
+                    total: all.length,
                     label: showAll ? 'find' : 'nearby find',
                     onFit: () => onFit([
                       if (origin != null && !showAll) origin,
@@ -678,10 +679,12 @@ class _LegendBar extends StatelessWidget {
     required this.count,
     required this.label,
     required this.onFit,
+    this.total,
     this.trailing,
     this.onRefresh,
   });
   final int count;
+  final int? total;
   final String label;
   final VoidCallback onFit;
   final String? trailing;
@@ -690,6 +693,9 @@ class _LegendBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final body = total == null || total == count
+        ? '$count $label${count == 1 ? '' : 's'}'
+        : '$count of $total $label${total == 1 ? '' : 's'}';
     return Material(
       color: scheme.surface.withValues(alpha: 0.92),
       borderRadius: BorderRadius.circular(16),
@@ -702,8 +708,7 @@ class _LegendBar extends StatelessWidget {
             const SizedBox(width: 8),
             Flexible(
               child: Text(
-                '$count $label${count == 1 ? '' : 's'}'
-                '${trailing == null ? '' : ' • $trailing'}',
+                '$body${trailing == null ? '' : ' • $trailing'}',
                 style: Theme.of(context).textTheme.labelLarge,
                 overflow: TextOverflow.ellipsis,
               ),
