@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../core/router/app_router.dart';
+import '../../shared/widgets/draggable_spot_button.dart';
 
-/// Bottom-nav scaffold with three tabs and a centred Spot capture button.
+/// Bottom-nav scaffold with three tabs + a floating draggable Spot button.
 class HomeShell extends StatelessWidget {
   const HomeShell({required this.navigationShell, super.key});
 
@@ -19,11 +19,11 @@ class HomeShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: navigationShell,
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push(AppRoutes.capture),
-        icon: const Icon(Icons.camera_alt_rounded),
-        label: const Text('Spot'),
+      body: Stack(
+        children: [
+          navigationShell,
+          const Positioned.fill(child: DraggableSpotButton()),
+        ],
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: navigationShell.currentIndex,
