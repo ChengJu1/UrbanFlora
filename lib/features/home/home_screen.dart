@@ -11,7 +11,7 @@ import '../../shared/widgets/observation_card.dart';
 import '../../shared/widgets/streak_ring.dart';
 import 'daily_digest.dart';
 
-/// Home dashboard: streak ring, recent finds list, daily-digest popup.
+/// Home tab — streak ring, recent finds, daily digest popup.
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
@@ -52,6 +52,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     title: _Greeting(uid: uid),
                     titleSpacing: 16,
                     actions: [
+                      IconButton(
+                        tooltip: 'Settings',
+                        icon: const Icon(Icons.settings_outlined),
+                        onPressed: () => context.push(AppRoutes.settings),
+                      ),
                       IconButton(
                         tooltip: 'Sign out',
                         icon: const Icon(Icons.logout),

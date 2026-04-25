@@ -12,11 +12,12 @@ import '../../features/identification/identification_args.dart';
 import '../../features/map/map_screen.dart';
 import '../../features/observation/observation_detail_screen.dart';
 import '../../features/onboarding/onboarding_screen.dart';
+import '../../features/settings/settings_screen.dart';
 import '../../features/shell/home_shell.dart';
 import '../../features/splash/splash_screen.dart';
 import '../models/observation.dart';
 
-/// All route paths in one place so screens never hard-code strings.
+/// All app route paths in one place.
 class AppRoutes {
   const AppRoutes._();
   static const splash = '/';
@@ -28,6 +29,7 @@ class AppRoutes {
   static const capture = '/capture';
   static const identify = '/identify';
   static const observation = '/observation';
+  static const settings = '/settings';
 }
 
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
@@ -106,6 +108,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               if (obs == null) return const _MissingArgs(screen: 'observation');
               return ObservationDetailScreen(observation: obs);
             },
+          ),
+          GoRoute(
+            path: AppRoutes.settings,
+            parentNavigatorKey: _shellNavigatorKey,
+            builder: (_, __) => const SettingsScreen(),
           ),
         ],
       ),

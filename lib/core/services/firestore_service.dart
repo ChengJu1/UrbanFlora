@@ -8,8 +8,7 @@ import '../models/observation.dart';
 import '../models/public_sighting.dart';
 import '../models/user_profile.dart';
 
-/// All Firestore reads and writes go through here, so the rest of the app
-/// never imports cloud_firestore directly.
+/// All Firestore reads/writes live here.
 class FirestoreService {
   FirestoreService({FirebaseFirestore? db})
       : _db = db ?? FirebaseFirestore.instance;
@@ -26,7 +25,7 @@ class FirestoreService {
 
   // ---- profile ----
 
-  /// Live stream of the user's profile doc.
+  /// Watch the user's profile.
   Stream<UserProfile> profileStream(String uid) {
     return _userDoc(uid).snapshots().map((snap) {
       return snap.exists
@@ -35,7 +34,7 @@ class FirestoreService {
     });
   }
 
-  /// Read the profile, creating a default one if missing.
+  /// Get the profile, or make a fresh one if it doesn't exist yet.
   Future<UserProfile> ensureProfile(String uid) async {
     final ref = _userDoc(uid);
     final snap = await ref.get();
@@ -45,17 +44,27 @@ class FirestoreService {
     return initial;
   }
 
+  Future<void> updateNickname({
+    required String uid,
+    required String nickname,
+  }) async {
+    await _userDoc(uid).set(
+      {'nickname': nickname.trim()},
+      SetOptions(merge: true),
+    );
+  }
+
   // ---- observations ----
 
   DocumentReference<Map<String, dynamic>> newObservationRef(String uid) =>
       _observations(uid).doc();
 
-  /// Save an observation under the owner's collection.
+  /// Save one observation for this user.
   Future<void> saveObservation(Observation obs) async {
     await _observations(obs.userId).doc(obs.id).set(obs.toMap());
   }
 
-  /// Live stream of the user's most recent observations, newest first.
+  /// Watch this user's most recent observations.
   Stream<List<Observation>> recentObservations(String uid, {int limit = 20}) {
     return _observations(uid)
         .orderBy('capturedAt', descending: true)
@@ -66,7 +75,7 @@ class FirestoreService {
 
   // ---- community ----
 
-  /// Publish a public copy of an observation with coords rounded to ~10 m.
+  /// Push a public copy with coords rounded to ~10 m.
   Future<void> publishSighting({
     required Observation obs,
     required String capturerNickname,
@@ -89,12 +98,12 @@ class FirestoreService {
     await _publicSightings().doc(sighting.id).set(sighting.toMap());
   }
 
-  /// Remove an observation from the community map.
+  /// Take a sighting back off the community map.
   Future<void> retractSighting(String observationId) async {
     await _publicSightings().doc(observationId).delete();
   }
 
-  /// Live stream of recent community sightings from all users.
+  /// Watch recent community sightings from everyone.
   Stream<List<PublicSighting>> recentPublicSightings({int limit = 200}) {
     return _publicSightings()
         .orderBy('capturedAt', descending: true)
@@ -108,8 +117,8 @@ class FirestoreService {
     return (v * f).round() / f;
   }
 
-  /// Increment streak + totals after a successful save. Runs in a transaction
-  /// so two quick saves don't race each other.
+  /// Bump streak + totals after a save. Uses a transaction so two quick
+  /// saves don't fight each other.
   Future<void> bumpStatsOnNewObservation({
     required String uid,
     required DateTime capturedAt,
