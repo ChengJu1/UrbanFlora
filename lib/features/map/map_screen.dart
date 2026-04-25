@@ -217,6 +217,7 @@ class _MineLayer extends ConsumerWidget {
       data: (observations) {
         final located =
             observations.where((o) => o.hasLocation).toList(growable: false);
+        final clusters = _clusterObsByCoords(located);
         return Stack(
           children: [
             FlutterMap(
@@ -240,14 +241,19 @@ class _MineLayer extends ConsumerWidget {
                 ),
                 MarkerLayer(
                   markers: [
-                    for (final obs in located)
+                    for (final group in clusters)
                       Marker(
-                        point: LatLng(obs.latitude!, obs.longitude!),
-                        width: 44,
-                        height: 44,
+                        point: LatLng(
+                            group.first.latitude!, group.first.longitude!),
+                        width: 52,
+                        height: 52,
                         child: _PlantPin(
-                          rarity: obs.chosenSpecies.rarity,
-                          onTap: () => _showMine(context, obs),
+                          rarity: _highestRarity(
+                              group.map((o) => o.chosenSpecies.rarity)),
+                          count: group.length,
+                          onTap: () => group.length == 1
+                              ? _showMine(context, group.first)
+                              : _showMineCluster(context, group),
                         ),
                       ),
                   ],
@@ -284,6 +290,20 @@ class _MineLayer extends ConsumerWidget {
       context: context,
       showDragHandle: true,
       builder: (_) => _MinePreviewSheet(observation: obs),
+    );
+  }
+
+  void _showMineCluster(BuildContext context, List<Observation> group) {
+    showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (_) => _MineClusterListSheet(
+        observations: group,
+        onTap: (obs) {
+          Navigator.of(context).pop();
+          _showMine(context, obs);
+        },
+      ),
     );
   }
 }
@@ -342,6 +362,11 @@ class _CommunityLayer extends ConsumerWidget {
             .where((s) => rarityFilter.contains(s.rarity))
             .toList(growable: false);
 
+        // Bucket pins that sit on (almost) the same spot so a stack of
+        // photos at one tree doesn't render as a single tiny dot. ~11m
+        // bucket on lat, ~longitude bucket scaled by latitude.
+        final clusters = _clusterByCoords(nearby);
+
         return Stack(
           children: [
             FlutterMap(
@@ -384,14 +409,17 @@ class _CommunityLayer extends ConsumerWidget {
                         height: 22,
                         child: _SelfDot(color: scheme.primary),
                       ),
-                    for (final s in nearby)
+                    for (final group in clusters)
                       Marker(
-                        point: LatLng(s.latitude, s.longitude),
-                        width: 44,
-                        height: 44,
+                        point: LatLng(group.first.latitude, group.first.longitude),
+                        width: 52,
+                        height: 52,
                         child: _PlantPin(
-                          rarity: s.rarity,
-                          onTap: () => _showCommunity(context, s),
+                          rarity: _highestRarity(group.map((s) => s.rarity)),
+                          count: group.length,
+                          onTap: () => group.length == 1
+                              ? _showCommunity(context, group.first)
+                              : _showClusterList(context, group),
                         ),
                       ),
                   ],
@@ -452,6 +480,53 @@ class _CommunityLayer extends ConsumerWidget {
       builder: (_) => _CommunityPreviewSheet(sighting: s),
     );
   }
+
+  void _showClusterList(BuildContext context, List<PublicSighting> group) {
+    showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (_) => _ClusterListSheet(
+        sightings: group,
+        onTap: (s) {
+          Navigator.of(context).pop();
+          _showCommunity(context, s);
+        },
+      ),
+    );
+  }
+}
+
+// group sightings whose coordinates round to the same ~11m bucket
+List<List<PublicSighting>> _clusterByCoords(List<PublicSighting> all) {
+  if (all.isEmpty) return const [];
+  final buckets = <String, List<PublicSighting>>{};
+  for (final s in all) {
+    // 4 decimal places ~= 11m at the equator. close enough for our pins.
+    final key =
+        '${s.latitude.toStringAsFixed(4)}_${s.longitude.toStringAsFixed(4)}';
+    buckets.putIfAbsent(key, () => []).add(s);
+  }
+  return buckets.values.toList(growable: false);
+}
+
+Rarity _highestRarity(Iterable<Rarity> rs) {
+  Rarity best = Rarity.values.first;
+  for (final r in rs) {
+    if (r.index > best.index) best = r;
+  }
+  return best;
+}
+
+List<List<Observation>> _clusterObsByCoords(List<Observation> all) {
+  if (all.isEmpty) return const [];
+  final buckets = <String, List<Observation>>{};
+  for (final o in all) {
+    if (o.latitude == null || o.longitude == null) continue;
+    final key =
+        '${o.latitude!.toStringAsFixed(4)}_${o.longitude!.toStringAsFixed(4)}';
+    buckets.putIfAbsent(key, () => []).add(o);
+  }
+  return buckets.values.toList(growable: false);
 }
 
 double _haversineMetres(double lat1, double lon1, double lat2, double lon2) {
@@ -472,29 +547,70 @@ double _deg2rad(double d) => d * math.pi / 180.0;
 // shared bits below
 
 class _PlantPin extends StatelessWidget {
-  const _PlantPin({required this.rarity, required this.onTap});
+  const _PlantPin({
+    required this.rarity,
+    required this.onTap,
+    this.count = 1,
+  });
   final Rarity rarity;
   final VoidCallback onTap;
+  final int count;
 
   @override
   Widget build(BuildContext context) {
     final color = Color(rarity.colorValue);
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          color: color,
-          shape: BoxShape.circle,
-          border: Border.all(color: Colors.white, width: 3),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.25),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
+      child: Stack(
+        clipBehavior: Clip.none,
+        alignment: Alignment.center,
+        children: [
+          SizedBox(
+            width: 44,
+            height: 44,
+            child: Container(
+              decoration: BoxDecoration(
+                color: color,
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 3),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.25),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child:
+                  const Icon(Icons.local_florist, color: Colors.white, size: 20),
             ),
-          ],
-        ),
-        child: const Icon(Icons.local_florist, color: Colors.white, size: 20),
+          ),
+          if (count > 1)
+            Positioned(
+              top: -2,
+              right: -2,
+              child: Container(
+                constraints: const BoxConstraints(minWidth: 22, minHeight: 22),
+                padding: const EdgeInsets.symmetric(horizontal: 5),
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.85),
+                  shape: BoxShape.rectangle,
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(color: Colors.white, width: 2),
+                ),
+                child: Center(
+                  child: Text(
+                    '$count',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
@@ -643,6 +759,133 @@ class _CommunityPreviewSheet extends StatelessWidget {
                   ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ClusterListSheet extends StatelessWidget {
+  const _ClusterListSheet({required this.sightings, required this.onTap});
+  final List<PublicSighting> sightings;
+  final ValueChanged<PublicSighting> onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.7,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '${sightings.length} finds at this spot',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+              ),
+              const SizedBox(height: 12),
+              Flexible(
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  itemCount: sightings.length,
+                  separatorBuilder: (_, __) => const Divider(height: 1),
+                  itemBuilder: (_, i) {
+                    final s = sightings[i];
+                    final when = DateFormat.yMMMd().format(s.capturedAt);
+                    return ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: SizedBox(
+                          width: 56,
+                          height: 56,
+                          child: ObservationImage(source: s.thumbUrl),
+                        ),
+                      ),
+                      title: Text(
+                        s.commonName,
+                        style: const TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                      subtitle: Text('${s.capturerNickname} · $when'),
+                      trailing: RarityBadge(rarity: s.rarity, compact: true),
+                      onTap: () => onTap(s),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _MineClusterListSheet extends StatelessWidget {
+  const _MineClusterListSheet({required this.observations, required this.onTap});
+  final List<Observation> observations;
+  final ValueChanged<Observation> onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.7,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '${observations.length} finds at this spot',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+              ),
+              const SizedBox(height: 12),
+              Flexible(
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  itemCount: observations.length,
+                  separatorBuilder: (_, __) => const Divider(height: 1),
+                  itemBuilder: (_, i) {
+                    final o = observations[i];
+                    final when = DateFormat.yMMMd().format(o.capturedAt);
+                    return ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: SizedBox(
+                          width: 56,
+                          height: 56,
+                          child: ObservationImage(source: o.thumbUrl),
+                        ),
+                      ),
+                      title: Text(
+                        o.chosenSpecies.commonName,
+                        style: const TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                      subtitle: Text(when),
+                      trailing: RarityBadge(
+                        rarity: o.chosenSpecies.rarity,
+                        compact: true,
+                      ),
+                      onTap: () => onTap(o),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
