@@ -5,21 +5,41 @@ import '../constants/api_keys.dart';
 import '../constants/app_constants.dart';
 import '../models/species.dart';
 
-/// Thrown when the Pl@ntNet API call fails.
+/// Thrown when something goes wrong calling the Pl@ntNet API.
 class PlantNetException implements Exception {
   PlantNetException(this.message, {this.statusCode});
   final String message;
   final int? statusCode;
+
+  /// A short message we can show to the user.
+  String get friendly {
+    switch (statusCode) {
+      case 401:
+      case 403:
+        return 'The plant identification key was rejected.';
+      case 404:
+        return 'The identification service is unreachable right now.';
+      case 413:
+        return 'That photo is a bit too large. Try a smaller one.';
+      case 429:
+        return 'Too many tries in a short time. Wait a moment and try again.';
+      case null:
+        return 'Network problem. Check your connection and try again.';
+      default:
+        return 'Could not reach the identification service. Try again in a moment.';
+    }
+  }
+
   @override
-  String toString() => 'PlantNetException($statusCode): $message';
+  String toString() => friendly;
 }
 
-/// Calls Pl@ntNet to turn a photo into top-k species guesses.
+/// Calls Pl@ntNet to turn a photo into top-k plant guesses.
 class PlantNetService {
   PlantNetService({Dio? dio}) : _dio = dio ?? Dio();
   final Dio _dio;
 
-  /// Identify a plant from a local image file.
+  /// Identify a plant from a local photo.
   Future<List<SpeciesCandidate>> identify({
     required String imagePath,
     String organ = 'auto',

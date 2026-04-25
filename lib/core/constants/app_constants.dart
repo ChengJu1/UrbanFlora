@@ -1,4 +1,4 @@
-/// App-wide string constants and tunables.
+/// App-wide constants.
 class AppConstants {
   const AppConstants._();
 
@@ -6,7 +6,7 @@ class AppConstants {
   static const String tagline = 'Every plant is a chapter.';
 
   static const String plantNetEndpoint =
-      'https://my-api.plantnet.org/v2/identify/k-world-flora';
+      'https://my-api.plantnet.org/v2/identify/the-plant-list';
 
   static const String openWeatherEndpoint =
       'https://api.openweathermap.org/data/2.5/weather';

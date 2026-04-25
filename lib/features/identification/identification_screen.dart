@@ -17,8 +17,7 @@ import '../../shared/widgets/observation_image.dart';
 import '../../shared/widgets/rarity_badge.dart';
 import 'identification_args.dart';
 
-/// Shows top-3 Pl@ntNet guesses. The user picks one, optionally writes a
-/// note, then saves it to their codex (and optionally the community map).
+/// Pick one of the top-3 plant guesses, add a note, then save.
 class IdentificationScreen extends ConsumerStatefulWidget {
   const IdentificationScreen({required this.args, super.key});
   final IdentificationArgs args;
@@ -137,9 +136,15 @@ class _IdentificationScreenState extends ConsumerState<IdentificationScreen> {
             return _LoadingView(imagePath: widget.args.imagePath);
           }
           if (snap.hasError || (snap.data ?? const []).isEmpty) {
+            final err = snap.error;
+            final friendly = err is PlantNetException
+                ? err.friendly
+                : err == null
+                    ? 'No suggestions came back. Try a clearer angle.'
+                    : 'Something went wrong. Please try again.';
             return _ErrorView(
               imagePath: widget.args.imagePath,
-              error: snap.error?.toString() ?? 'No candidates returned',
+              error: friendly,
             );
           }
           final candidates = snap.data!;
@@ -191,18 +196,42 @@ class _ErrorView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return ListView(
       padding: const EdgeInsets.only(bottom: 48),
       children: [
         _HeroImage(path: imagePath),
-        const SizedBox(height: 24),
-        const Icon(Icons.error_outline, size: 48),
+        const SizedBox(height: 32),
+        Icon(Icons.error_outline, size: 56, color: scheme.error),
+        const SizedBox(height: 12),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32),
+          child: Text(
+            'Could not identify this one',
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+          ),
+        ),
         const SizedBox(height: 8),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+          padding: const EdgeInsets.symmetric(horizontal: 32),
           child: Text(
-            'Could not identify this one — $error',
+            error,
             textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: scheme.onSurfaceVariant,
+                ),
+          ),
+        ),
+        const SizedBox(height: 28),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32),
+          child: FilledButton.icon(
+            onPressed: () => context.pop(),
+            icon: const Icon(Icons.refresh),
+            label: const Text('Try a different photo'),
           ),
         ),
       ],
@@ -275,7 +304,7 @@ class _ResultView extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              // toggle: also publish to community map?
+              // toggle: also share on the community map?
               _CommunityToggle(
                 value: shareToCommunity,
                 hasLocation: hasLocation,
