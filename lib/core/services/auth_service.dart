@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-/// Thin wrapper around FirebaseAuth + Google sign-in.
+/// Wraps FirebaseAuth + Google sign-in.
 class AuthService {
   AuthService({FirebaseAuth? auth, GoogleSignIn? googleSignIn})
       : _auth = auth ?? FirebaseAuth.instance,
@@ -11,17 +11,46 @@ class AuthService {
   final FirebaseAuth _auth;
   final GoogleSignIn _googleSignIn;
 
-  /// Stream that emits whenever the user signs in or out.
+  /// Fires every time the user signs in / out.
   Stream<User?> authStateChanges() => _auth.authStateChanges();
   User? get currentUser => _auth.currentUser;
 
-  /// Sign in as a guest, no account needed.
+  /// Sign in as a guest (no account needed).
   Future<User?> signInAnonymously() async {
     final cred = await _auth.signInAnonymously();
     return cred.user;
   }
 
-  /// Sign in via the Google account picker.
+  /// Make a new email/password account.
+  Future<User?> registerWithEmail({
+    required String email,
+    required String password,
+    required String nickname,
+  }) async {
+    final cred = await _auth.createUserWithEmailAndPassword(
+      email: email.trim(),
+      password: password,
+    );
+    final user = cred.user;
+    if (user != null && nickname.trim().isNotEmpty) {
+      await user.updateDisplayName(nickname.trim());
+    }
+    return user;
+  }
+
+  /// Email + password sign in.
+  Future<User?> signInWithEmail({
+    required String email,
+    required String password,
+  }) async {
+    final cred = await _auth.signInWithEmailAndPassword(
+      email: email.trim(),
+      password: password,
+    );
+    return cred.user;
+  }
+
+  /// Sign in with the Google account picker.
   Future<User?> signInWithGoogle() async {
     final gUser = await _googleSignIn.signIn();
     if (gUser == null) return null;
