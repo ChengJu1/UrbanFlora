@@ -25,9 +25,21 @@ if you log at least one plant a week).
 Screenshots live in `docs/screenshots/`. A short demo gif is at
 `docs/screenshots/demo.gif`.
 
-| Splash | Onboarding | Home | Camera | Identify | Achievement | Detail | Map | Codex | Digest |
-|---|---|---|---|---|---|---|---|---|---|
-| `01_splash.png` | `02_onboarding.png` | `03_home.png` | `04_camera.png` | `05_identify.png` | `06_achievement.png` | `07_detail.png` | `08_map.png` | `09_codex.png` | `10_digest.png` |
+| Splash | Onboarding (1/3) | Onboarding (2/3) | Onboarding (3/3) |
+|---|---|---|---|
+| `01_splash.jpg` | `02_onboarding_a.jpg` | `03_onboarding_b.jpg` | `04_onboarding_c.jpg` |
+
+| Sign in | Home | Camera | Identify |
+|---|---|---|---|
+| `05_signin.jpg` | `06_home.jpg` | `07_camera.jpg` | `08_identify.jpg` |
+
+| Achievement | Detail | Daily digest | My map |
+|---|---|---|---|
+| `09_achievement.jpg` | `10_detail.jpg` | `11_digest.jpg` | `12_map_mine.jpg` |
+
+| Community map | Codex | Settings |
+|---|---|---|
+| `13_map_community.jpg` | `14_codex.jpg` | `15_settings.jpg` |
 
 ## How it's put together
 
