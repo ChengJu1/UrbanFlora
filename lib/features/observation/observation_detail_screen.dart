@@ -4,12 +4,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/models/observation.dart';
+import '../../core/services/auth_service.dart';
+import '../../core/services/firestore_service.dart';
 import '../../core/services/share_service.dart';
 import '../../shared/widgets/observation_image.dart';
 import '../../shared/widgets/rarity_badge.dart';
 
-/// Full detail page for one saved observation. Big hero photo, species info,
-/// time / place / weather metadata, notes, and a share button.
+/// Detail page for one saved find — photo, species, when/where, notes.
 class ObservationDetailScreen extends ConsumerStatefulWidget {
   const ObservationDetailScreen({required this.observation, super.key});
   final Observation observation;
@@ -22,6 +23,7 @@ class ObservationDetailScreen extends ConsumerStatefulWidget {
 class _ObservationDetailScreenState
     extends ConsumerState<ObservationDetailScreen> {
   bool _sharing = false;
+  bool _publishing = false;
 
   Future<void> _share() async {
     if (_sharing) return;
@@ -39,6 +41,39 @@ class _ObservationDetailScreenState
       );
     } finally {
       if (mounted) setState(() => _sharing = false);
+    }
+  }
+
+  Future<void> _publishToCommunity() async {
+    if (_publishing) return;
+    final user = ref.read(authServiceProvider)?.currentUser;
+    if (user == null) return;
+    setState(() => _publishing = true);
+    try {
+      final fs = ref.read(firestoreServiceProvider);
+      final profile = await fs.ensureProfile(user.uid);
+      await fs.publishSighting(
+        obs: widget.observation,
+        capturerNickname: profile.nickname,
+      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Posted to the community map.'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } on Object catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Could not publish: $e'),
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 6),
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _publishing = false);
     }
   }
 
@@ -70,7 +105,7 @@ class _ObservationDetailScreenState
           ),
         );
       case ShareOutcome.dismissed:
-        // user cancelled, no message
+        // user backed out, do nothing
         break;
       case ShareOutcome.unavailable:
         messenger.showSnackBar(
@@ -181,6 +216,49 @@ class _ObservationDetailScreenState
                       icon: Icons.wb_sunny_outlined,
                       label:
                           '${obs.weather!.tempC.toStringAsFixed(1)}°C • ${obs.weather!.description} • humidity ${obs.weather!.humidity}%',
+                    ),
+                  const SizedBox(height: 16),
+                  if (obs.hasLocation)
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton.tonalIcon(
+                        onPressed: _publishing ? null : _publishToCommunity,
+                        icon: _publishing
+                            ? const SizedBox(
+                                height: 16,
+                                width: 16,
+                                child: CircularProgressIndicator(strokeWidth: 2),
+                              )
+                            : const Icon(Icons.public),
+                        label: Text(_publishing
+                            ? 'Posting…'
+                            : 'Publish to community map'),
+                      ),
+                    )
+                  else
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: scheme.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.public_off,
+                              size: 18, color: scheme.onSurfaceVariant),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              'No GPS attached, so this find can\'t go on the '
+                              'community map.',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.copyWith(color: scheme.onSurfaceVariant),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   const SizedBox(height: 20),
                   const _SectionTitle(title: 'Other candidates'),

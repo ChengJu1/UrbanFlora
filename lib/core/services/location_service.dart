@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geocoding/geocoding.dart' as geo;
 import 'package:geolocator/geolocator.dart';
 
-/// Lat / lon plus a reverse-geocoded street address.
+/// Lat / lon plus a street address from reverse geocoding.
 class GeoFix {
   const GeoFix({required this.latitude, required this.longitude, this.address});
   final double latitude;
@@ -10,9 +10,9 @@ class GeoFix {
   final String? address;
 }
 
-/// Wraps geolocator + geocoding into one easy "get me a fix" call.
+/// Small helper around geolocator + geocoding.
 class LocationService {
-  /// Returns the current GPS fix with address, or null on any failure.
+  /// Get the current location + address, or null if anything goes wrong.
   Future<GeoFix?> currentFix() async {
     final enabled = await Geolocator.isLocationServiceEnabled();
     if (!enabled) return null;
@@ -26,12 +26,23 @@ class LocationService {
       return null;
     }
 
-    final pos = await Geolocator.getCurrentPosition(
-      locationSettings: const LocationSettings(
-        accuracy: LocationAccuracy.high,
-        timeLimit: Duration(seconds: 8),
-      ),
-    );
+    Position? pos;
+    try {
+      pos = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          timeLimit: Duration(seconds: 8),
+        ),
+      );
+    } on Object {
+      // gps failed (often happens indoors), try the last known position
+      try {
+        pos = await Geolocator.getLastKnownPosition();
+      } on Object {
+        pos = null;
+      }
+    }
+    if (pos == null) return null;
 
     String? address;
     try {

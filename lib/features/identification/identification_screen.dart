@@ -57,11 +57,15 @@ class _IdentificationScreenState extends ConsumerState<IdentificationScreen> {
       return;
     }
     setState(() => _saving = true);
-    try {
-      final fs = ref.read(firestoreServiceProvider);
-      final storage = ref.read(storageServiceProvider);
-      final weatherSvc = ref.read(weatherServiceProvider);
 
+    final fs = ref.read(firestoreServiceProvider);
+    final storage = ref.read(storageServiceProvider);
+    final weatherSvc = ref.read(weatherServiceProvider);
+
+    Observation? saved;
+
+    // step 1: save to my codex (must succeed, else nothing was saved)
+    try {
       final docRef = fs.newObservationRef(user.uid);
       final obsId = docRef.id;
 
@@ -73,10 +77,11 @@ class _IdentificationScreenState extends ConsumerState<IdentificationScreen> {
 
       final fix = widget.args.fix;
       final weather = (fix != null)
-          ? await weatherSvc.currentWeather(lat: fix.latitude, lon: fix.longitude)
+          ? await weatherSvc.currentWeather(
+              lat: fix.latitude, lon: fix.longitude)
           : null;
 
-      final obs = Observation(
+      saved = Observation(
         id: obsId,
         userId: user.uid,
         photoUrl: uploaded.photoUrl,
@@ -92,37 +97,63 @@ class _IdentificationScreenState extends ConsumerState<IdentificationScreen> {
         notes: _notesController.text.trim(),
       );
 
-      await fs.saveObservation(obs);
+      await fs.saveObservation(saved);
       await fs.bumpStatsOnNewObservation(
         uid: user.uid,
         capturedAt: widget.args.capturedAt,
       );
-
-      if (_shareToCommunity && obs.hasLocation) {
-        final profile = await fs.ensureProfile(user.uid);
-        await fs.publishSighting(
-          obs: obs,
-          capturerNickname: profile.nickname,
-        );
-      }
-
-      if (!mounted) return;
-      await AchievementOverlay.show(
-        context,
-        commonName: obs.chosenSpecies.commonName,
-        scientificName: obs.chosenSpecies.scientificName,
-        rarity: obs.chosenSpecies.rarity,
-      );
-      if (!mounted) return;
-      context.go(AppRoutes.home);
     } on Object catch (e) {
       if (!mounted) return;
+      setState(() => _saving = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Save failed: $e')),
+        SnackBar(
+          content: Text('Save failed: $e'),
+          duration: const Duration(seconds: 6),
+        ),
       );
-    } finally {
-      if (mounted) setState(() => _saving = false);
+      return;
     }
+
+    // step 2: publish to community map (allowed to fail)
+    String? communityWarning;
+    if (_shareToCommunity && saved.hasLocation) {
+      try {
+        final profile = await fs.ensureProfile(user.uid);
+        await fs.publishSighting(
+          obs: saved,
+          capturerNickname: profile.nickname,
+        );
+      } on Object catch (e) {
+        communityWarning = e.toString();
+      }
+    } else if (_shareToCommunity && !saved.hasLocation) {
+      communityWarning = 'no GPS fix attached';
+    }
+
+    if (!mounted) return;
+    setState(() => _saving = false);
+
+    await AchievementOverlay.show(
+      context,
+      commonName: saved.chosenSpecies.commonName,
+      scientificName: saved.chosenSpecies.scientificName,
+      rarity: saved.chosenSpecies.rarity,
+    );
+    if (!mounted) return;
+
+    if (communityWarning != null) {
+      // photo IS saved to the codex, just not on the community map
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Saved to your codex, but community share failed '
+            '($communityWarning). You can retry from the find detail page.',
+          ),
+          duration: const Duration(seconds: 6),
+        ),
+      );
+    }
+    context.go(AppRoutes.home);
   }
 
   @override
