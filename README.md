@@ -13,6 +13,14 @@ data is yours.
 [Landing page](docs/index.html) · [Storyboard](docs/storyboard.md) ·
 [Personas](docs/personas.md) · [User testing plan](docs/user_testing_plan.md)
 
+## Storyboard
+
+<p align="center">
+  <img src="docs/screenshots/storyboard_concept.png" width="640" alt="UrbanFlora storyboard concept">
+</p>
+
+<p align="center"><sub><i>Concept illustration generated with Google Gemini.</i></sub></p>
+
 ## Why
 
 Most people in cities walk past hundreds of plants every day without ever
