@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "648529180074",
+    "project_id": "urbanflora-dev",
+    "storage_bucket": "urbanflora-dev.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:648529180074:android:92883dff340336387a27d3",
+        "android_client_info": {
+          "package_name": "com.urbanflora.urban_flora"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "648529180074-as99650skdnqd53lisq779ucgc9s3agq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.urbanflora.urban_flora",
+            "certificate_hash": "d1cc06a3749cd4bac1b9d16e34c8574605d0de1f"
+          }
+        },
+        {
+          "client_id": "648529180074-c1802kidsfdd0s6268kji45qmapv0r7i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA9HAxMargdJ9b-goaZo5T0Jb9aagB_U2s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "648529180074-c1802kidsfdd0s6268kji45qmapv0r7i.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "648529180074-5e65qgrfj5ns5es6erje37e1s0pgv9jt.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.urbanflora.urbanFlora"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

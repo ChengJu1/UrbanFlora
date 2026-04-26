@@ -50,7 +50,7 @@ photo/
 
 # Secrets — DO NOT COMMIT
 lib/core/constants/api_keys.dart
-android/app/google-services.json
+# android/app/google-services.json
 ios/Runner/GoogleService-Info.plist
 firebase_options.dart.user
 **/service-account*.json
