@@ -215,7 +215,6 @@ VS Code 打开 `lib\core\constants\api_keys.dart`，把两个 `YOUR_*` 换成真
 ```powershell
 flutter devices             # 确认能看到设备
 flutter analyze             # 必须 0 errors
-flutter test                # 5 个 test file 应全绿
 flutter run
 ```
 
@@ -338,10 +337,9 @@ git push
 提交前最后一次勾：
 
 - [ ] `flutter analyze` = 0 errors
-- [ ] `flutter test` 全绿
 - [ ] GitHub Actions `Flutter CI` 最新一次绿勾
 - [ ] 仓库根部 `README.md` 能在 GitHub 上正常渲染，所有链接点得开
-- [ ] `docs/screenshots/` 下 10 张 PNG + 1 个 demo.gif 齐全
+- [ ] `docs/screenshots/` 下 15 张截图齐全
 - [ ] GitHub Pages 落地页 `chengju1.github.io/CASA0015/` 能访问
 - [ ] `docs/personas.md`、`storyboard.md`、`user_testing_plan.md` 都在
 - [ ] `firebase deploy` 过的规则生效（Firestore 控制台 Rules 标签能看到你的规则内容）

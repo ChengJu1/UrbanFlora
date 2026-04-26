@@ -22,8 +22,6 @@ if you log at least one plant a week).
 
 ## Screens
 
-A short demo gif is at `docs/screenshots/demo.gif`.
-
 | Splash | Onboarding (1/3) | Onboarding (2/3) | Onboarding (3/3) |
 |---|---|---|---|
 | <img src="docs/screenshots/01_splash.jpg" width="200"> | <img src="docs/screenshots/02_onboarding_a.jpg" width="200"> | <img src="docs/screenshots/03_onboarding_b.jpg" width="200"> | <img src="docs/screenshots/04_onboarding_c.jpg" width="200"> |
