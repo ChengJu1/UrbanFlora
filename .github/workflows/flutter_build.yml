@@ -34,8 +34,18 @@ jobs:
           flutter-version: '3.41.x'
           channel: stable
           cache: true
-      - name: Provide placeholder API keys
-        run: cp lib/core/constants/api_keys.dart.example lib/core/constants/api_keys.dart
+      - name: Write api_keys.dart from secrets
+        env:
+          PLANTNET_API_KEY: ${{ secrets.PLANTNET_API_KEY }}
+          OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
+        run: |
+          cp lib/core/constants/api_keys.dart.example lib/core/constants/api_keys.dart
+          if [ -n "$PLANTNET_API_KEY" ]; then
+            sed -i "s|YOUR_PLANTNET_API_KEY|$PLANTNET_API_KEY|" lib/core/constants/api_keys.dart
+          fi
+          if [ -n "$OPENWEATHER_API_KEY" ]; then
+            sed -i "s|YOUR_OPENWEATHER_API_KEY|$OPENWEATHER_API_KEY|" lib/core/constants/api_keys.dart
+          fi
       - name: Get Flutter dependencies    
         run: flutter pub get
       - name: Build APK Release             
