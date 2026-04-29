@@ -26,10 +26,23 @@ jobs:
       - name: Print Flutter version
         run: flutter --version
 
-      # api_keys.dart is .gitignored; CI uses the committed example so the
-      # project still compiles without leaking real secrets.
-      - name: Provide placeholder API keys
-        run: cp lib/core/constants/api_keys.dart.example lib/core/constants/api_keys.dart
+      # api_keys.dart is .gitignored. If PLANTNET_API_KEY / OPENWEATHER_API_KEY
+      # secrets are set, they get inlined; otherwise we fall back to placeholders
+      # so the project still compiles (e.g. on PRs from forks).
+      - name: Write api_keys.dart from secrets
+        env:
+          PLANTNET_API_KEY: ${{ secrets.PLANTNET_API_KEY }}
+          OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
+        run: |
+          python3 <<'PY'
+          import os, pathlib
+          src = pathlib.Path('lib/core/constants/api_keys.dart.example').read_text()
+          plantnet = (os.environ.get('PLANTNET_API_KEY') or '').strip() or 'YOUR_PLANTNET_API_KEY'
+          openweather = (os.environ.get('OPENWEATHER_API_KEY') or '').strip() or 'YOUR_OPENWEATHER_API_KEY'
+          src = src.replace('YOUR_PLANTNET_API_KEY', plantnet)
+          src = src.replace('YOUR_OPENWEATHER_API_KEY', openweather)
+          pathlib.Path('lib/core/constants/api_keys.dart').write_text(src)
+          PY
 
       - name: Install dependencies
         run: flutter pub get
