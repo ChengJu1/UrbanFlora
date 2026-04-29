@@ -47,6 +47,7 @@ coverage/
 
 # raw screenshots before sorting
 photo/
+docs/*.pptx
 
 # Secrets — DO NOT COMMIT
 lib/core/constants/api_keys.dart
