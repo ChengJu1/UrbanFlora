@@ -1,7 +1,7 @@
 name: urban_flora
 description: "UrbanFlora — turn every walk into a citizen-science biodiversity log."
 publish_to: "none"
-version: 0.1.2+3
+version: 0.1.3+4
 
 environment:
   sdk: ^3.5.0
