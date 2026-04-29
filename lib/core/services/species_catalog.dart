@@ -4,36 +4,29 @@ import 'package:flutter/services.dart' show rootBundle;
 
 import '../models/species.dart';
 
-/// Loads `assets/seed/species_seed.json` and answers rarity lookups.
+/// Reads the bundled species seed and answers rarity lookups.
 ///
-/// Call [load] once during app startup before [runApp]; after that, the
-/// rest of the app can read [instance] synchronously.
+/// Call `load()` once at startup; afterwards `instance` is safe to read
+/// from anywhere synchronously.
 class SpeciesCatalog {
   SpeciesCatalog._(this._byScientific, this._byGenus, this._byFamily);
 
-  // exact scientific name -> rarity (lower-cased keys)
   final Map<String, Rarity> _byScientific;
-
-  // first word of the scientific name -> rarity, for genus fallback
   final Map<String, Rarity> _byGenus;
-
-  // family name -> rarity, for the last-resort fallback
   final Map<String, Rarity> _byFamily;
 
   static SpeciesCatalog _instance =
       SpeciesCatalog._(const {}, const {}, const {});
 
-  /// The currently loaded catalog (empty until [load] finishes).
   static SpeciesCatalog get instance => _instance;
 
-  /// Reads the bundled seed file and caches it in [instance].
+  /// Reads assets/seed/species_seed.json and caches it.
   static Future<void> load() async {
     final raw = await rootBundle.loadString('assets/seed/species_seed.json');
     final list = (jsonDecode(raw) as List).cast<Map<String, dynamic>>();
 
     final byScientific = <String, Rarity>{};
     final byGenus = <String, Rarity>{};
-    // count rarities per family so we can pick the most common one
     final familyHits = <String, Map<Rarity, int>>{};
 
     for (final row in list) {
@@ -43,9 +36,7 @@ class SpeciesCatalog {
       if (sci.isEmpty) continue;
       byScientific[sci] = tier;
 
-      // genus is the first word of the scientific name (e.g. "rosa" in
-      // "Rosa canina"); we keep the lowest-rarity entry for the genus so
-      // that genus fallback stays cautious instead of inflating tiers.
+      // genus is the first word of the scientific name
       final genus = sci.split(' ').first;
       final existingGenus = byGenus[genus];
       if (existingGenus == null || tier.index < existingGenus.index) {
@@ -58,9 +49,9 @@ class SpeciesCatalog {
       }
     }
 
+    // for the family fallback, pick the rarity that shows up the most
     final byFamily = <String, Rarity>{};
     familyHits.forEach((family, hits) {
-      // pick whichever rarity appears most often inside this family
       final top = hits.entries.reduce((a, b) => a.value >= b.value ? a : b);
       byFamily[family] = top.key;
     });
@@ -68,11 +59,8 @@ class SpeciesCatalog {
     _instance = SpeciesCatalog._(byScientific, byGenus, byFamily);
   }
 
-  /// Looks up a rarity tier.
-  ///
-  /// Tries (in order) the exact scientific name, the genus, then the
-  /// family. Falls back to [Rarity.common] when nothing matches, since
-  /// most plants you bump into in a city are common.
+  /// Tries the exact name, then the genus, then the family.
+  /// Falls back to common when nothing matches.
   Rarity rarityFor({String? scientificName, String? family}) {
     final sci = scientificName?.trim().toLowerCase();
     if (sci != null && sci.isNotEmpty) {

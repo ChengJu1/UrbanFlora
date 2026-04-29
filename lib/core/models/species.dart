@@ -69,9 +69,7 @@ class SpeciesCandidate {
         score: (map['score'] as num?)?.toDouble() ?? 0,
       );
 
-  // rarity comes from the seeded species catalog: an orchid stays rare
-  // even when Pl@ntNet is super confident, and a clear shot of a daisy
-  // does not turn it "legendary" just because the score is low.
+  // looked up in the species catalog; score above is just confidence
   Rarity get rarity => SpeciesCatalog.instance.rarityFor(
         scientificName: scientificName,
         family: family,

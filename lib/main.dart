@@ -29,9 +29,7 @@ Future<void> main() async {
     debugPrint('[UrbanFlora] notifications init failed: $e');
   }
 
-  // load the bundled species seed so rarity lookups are ready before
-  // the first frame; if the asset is missing for any reason we just keep
-  // running with an empty catalog (every species will fall back to common).
+  // load the species seed so rarity lookups are ready before first frame
   try {
     await SpeciesCatalog.load();
   } on Object catch (e) {
