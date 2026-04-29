@@ -10,7 +10,7 @@ keep you coming back, and a map plus a family-grouped codex let you browse
 what you've collected so far. Everything lives in your own Firebase, so the
 data is yours.
 
-[Landing page](docs/index.html)
+[Landing page](https://chengju1.github.io/UrbanFlora/)
 
 ## Why
 
@@ -23,19 +23,19 @@ if you log at least one plant a week).
 
 | Splash | Onboarding (1/3) | Onboarding (2/3) | Onboarding (3/3) |
 |---|---|---|---|
-| <img src="docs/screenshots/01_splash.jpg" width="200"> | <img src="docs/screenshots/02_onboarding_a.jpg" width="200"> | <img src="docs/screenshots/03_onboarding_b.jpg" width="200"> | <img src="docs/screenshots/04_onboarding_c.jpg" width="200"> |
+| <img src="screenshots/01_splash.jpg" width="200"> | <img src="screenshots/02_onboarding_a.jpg" width="200"> | <img src="screenshots/03_onboarding_b.jpg" width="200"> | <img src="screenshots/04_onboarding_c.jpg" width="200"> |
 
 | Sign in | Home | Camera | Identify |
 |---|---|---|---|
-| <img src="docs/screenshots/05_signin.jpg" width="200"> | <img src="docs/screenshots/06_home.jpg" width="200"> | <img src="docs/screenshots/07_camera.jpg" width="200"> | <img src="docs/screenshots/08_identify.jpg" width="200"> |
+| <img src="screenshots/05_signin.jpg" width="200"> | <img src="screenshots/06_home.jpg" width="200"> | <img src="screenshots/07_camera.jpg" width="200"> | <img src="screenshots/08_identify.jpg" width="200"> |
 
 | Achievement | Detail | Daily digest | My map |
 |---|---|---|---|
-| <img src="docs/screenshots/09_achievement.jpg" width="200"> | <img src="docs/screenshots/10_detail.jpg" width="200"> | <img src="docs/screenshots/11_digest.jpg" width="200"> | <img src="docs/screenshots/12_map_mine.jpg" width="200"> |
+| <img src="screenshots/09_achievement.jpg" width="200"> | <img src="screenshots/10_detail.jpg" width="200"> | <img src="screenshots/11_digest.jpg" width="200"> | <img src="screenshots/12_map_mine.jpg" width="200"> |
 
 | Community map | Codex | Settings |
 |---|---|---|
-| <img src="docs/screenshots/13_map_community.jpg" width="200"> | <img src="docs/screenshots/14_codex.jpg" width="200"> | <img src="docs/screenshots/15_settings.jpg" width="200"> |
+| <img src="screenshots/13_map_community.jpg" width="200"> | <img src="screenshots/14_codex.jpg" width="200"> | <img src="screenshots/15_settings.jpg" width="200"> |
 
 ## How it's put together
 

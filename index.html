@@ -1,0 +1,737 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UrbanFlora — Every plant is a chapter</title>
+  <meta name="description" content="UrbanFlora is a Flutter mobile app that turns every walk through the city into a citizen-science biodiversity log." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #f6f1e7;
+      --bg-soft: #fffaf0;
+      --ink: #0c1612;
+      --muted: #5d6b60;
+      --accent: #0b3d2e;
+      --accent-soft: #d9eadf;
+      --gold: #e2a93b;
+      --card: rgba(255, 255, 255, 0.86);
+      --line: rgba(12, 22, 18, 0.10);
+      --shadow: 0 18px 50px rgba(12, 22, 18, 0.12);
+      --radius: 24px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0c1612;
+        --bg-soft: #101f18;
+        --ink: #f6f1e7;
+        --muted: #a7b5aa;
+        --accent: #a7d7b5;
+        --accent-soft: rgba(167, 215, 181, 0.14);
+        --card: rgba(20, 36, 28, 0.92);
+        --line: rgba(246, 241, 231, 0.12);
+        --shadow: 0 18px 50px rgba(0, 0, 0, 0.32);
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background:
+        radial-gradient(circle at 12% 8%, rgba(226, 169, 59, 0.22), transparent 28%),
+        radial-gradient(circle at 88% 16%, rgba(11, 61, 46, 0.16), transparent 30%),
+        var(--bg);
+      color: var(--ink);
+      line-height: 1.6;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    .wrap {
+      width: min(1120px, calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(18px);
+      background: color-mix(in srgb, var(--bg) 84%, transparent);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .nav-inner {
+      height: 74px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 900;
+      font-size: 20px;
+      letter-spacing: -0.4px;
+    }
+
+    .logo-mark {
+      width: 32px;
+      height: 32px;
+      border-radius: 14px;
+      background:
+        radial-gradient(circle at 35% 30%, #ffffff 0 8%, transparent 9%),
+        linear-gradient(135deg, var(--accent), #1f7a55);
+      box-shadow: inset -5px -5px 0 rgba(0, 0, 0, 0.08);
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    nav a {
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    nav a:hover {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .hero {
+      min-height: calc(100vh - 74px);
+      padding: 78px 0 70px;
+      display: grid;
+      grid-template-columns: 1.08fr 0.92fr;
+      gap: 56px;
+      align-items: center;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 13px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    .tag::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--gold);
+    }
+
+    h1 {
+      max-width: 640px;
+      margin: 0 0 20px;
+      font-size: clamp(42px, 7vw, 76px);
+      line-height: 0.95;
+      letter-spacing: -3px;
+      font-weight: 900;
+    }
+
+    .lead {
+      max-width: 570px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 18px;
+    }
+
+    .cta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 30px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 0 20px;
+      border-radius: 16px;
+      font-weight: 900;
+      font-size: 14px;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn.primary {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 14px 30px color-mix(in srgb, var(--accent) 28%, transparent);
+    }
+
+    .btn.ghost {
+      border: 1.5px solid var(--line);
+      background: color-mix(in srgb, var(--card) 84%, transparent);
+      color: var(--ink);
+    }
+
+    .mini-stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      max-width: 570px;
+      margin-top: 34px;
+    }
+
+    .stat {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: color-mix(in srgb, var(--card) 78%, transparent);
+    }
+
+    .stat b {
+      display: block;
+      font-size: 20px;
+      line-height: 1.1;
+    }
+
+    .stat span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .phone-wrap {
+      position: relative;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .phone-wrap::before {
+      content: "";
+      position: absolute;
+      width: 320px;
+      height: 320px;
+      border-radius: 999px;
+      background: rgba(226, 169, 59, 0.24);
+      filter: blur(8px);
+      transform: translate(-42px, 82px);
+      z-index: 0;
+    }
+
+    .phone {
+      position: relative;
+      z-index: 1;
+      width: min(340px, 100%);
+      aspect-ratio: 9 / 19;
+      padding: 14px;
+      border-radius: 42px;
+      background: linear-gradient(160deg, #0b3d2e, #14241c);
+      box-shadow: 0 28px 80px rgba(0, 0, 0, 0.28);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+    }
+
+    .screen {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      border-radius: 30px;
+      background: #000;
+    }
+
+    .screen img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    section {
+      padding: 66px 0;
+    }
+
+    .section-title {
+      margin: 0 0 8px;
+      font-size: clamp(28px, 4vw, 42px);
+      line-height: 1.08;
+      letter-spacing: -1.4px;
+      font-weight: 900;
+    }
+
+    .section-sub {
+      max-width: 680px;
+      margin: 0 0 30px;
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      min-height: 100%;
+      padding: 24px;
+      border-radius: var(--radius);
+      background: var(--card);
+      border: 1px solid var(--line);
+      box-shadow: 0 10px 28px rgba(12, 22, 18, 0.05);
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow);
+      border-color: color-mix(in srgb, var(--accent) 25%, var(--line));
+    }
+
+    .icon {
+      width: 44px;
+      height: 44px;
+      margin-bottom: 14px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 22px;
+      font-weight: 900;
+    }
+
+    .card h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+      line-height: 1.25;
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .steps .card {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .steps .card::after {
+      content: attr(data-step);
+      position: absolute;
+      right: 18px;
+      top: 10px;
+      color: color-mix(in srgb, var(--accent) 12%, transparent);
+      font-size: 68px;
+      line-height: 1;
+      font-weight: 900;
+    }
+
+    .screens-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .shot {
+      border-radius: 26px;
+      overflow: hidden;
+      background: #000;
+      border: 1px solid var(--line);
+      box-shadow: 0 16px 40px rgba(12, 22, 18, 0.14);
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .shot:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow);
+    }
+
+    .shot img {
+      width: 100%;
+      aspect-ratio: 9 / 19;
+      object-fit: cover;
+    }
+
+    .storyboard {
+      display: grid;
+      grid-template-columns: 1fr 0.85fr;
+      gap: 24px;
+      align-items: center;
+      padding: 26px;
+      border-radius: 32px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      box-shadow: 0 12px 34px rgba(12, 22, 18, 0.06);
+    }
+
+    .storyboard img {
+      border-radius: 24px;
+      border: 1px solid var(--line);
+    }
+
+    .tech {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .tech span {
+      padding: 8px 13px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 800;
+      font-size: 12px;
+      border: 1px solid color-mix(in srgb, var(--accent) 12%, transparent);
+    }
+
+    footer {
+      margin-top: 36px;
+      padding: 34px 0 52px;
+      color: var(--muted);
+      font-size: 13px;
+      border-top: 1px solid var(--line);
+    }
+
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .footer-inner a {
+      color: var(--accent);
+      font-weight: 900;
+    }
+
+    @media (max-width: 920px) {
+      .hero {
+        min-height: auto;
+        grid-template-columns: 1fr;
+        padding: 50px 0 40px;
+        gap: 42px;
+      }
+
+      .phone-wrap {
+        justify-content: center;
+      }
+
+      .grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .screens-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .storyboard {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .wrap {
+        width: min(100% - 28px, 1120px);
+      }
+
+      .nav-inner {
+        height: auto;
+        padding: 16px 0;
+        align-items: flex-start;
+      }
+
+      nav a {
+        padding: 6px 8px;
+        font-size: 13px;
+      }
+
+      h1 {
+        letter-spacing: -2px;
+      }
+
+      .lead {
+        font-size: 16px;
+      }
+
+      .mini-stats {
+        grid-template-columns: 1fr;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .screens-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      section {
+        padding: 46px 0;
+      }
+
+      .footer-inner {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="wrap nav-inner">
+      <a class="logo" href="#" aria-label="UrbanFlora home">
+        <span class="logo-mark" aria-hidden="true"></span>
+        <span>UrbanFlora</span>
+      </a>
+
+      <nav aria-label="Primary navigation">
+        <a href="#features">Features</a>
+        <a href="#how">How it works</a>
+        <a href="#screens">Screens</a>
+        <a href="https://github.com/ChengJu1/UrbanFlora">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <div>
+        <span class="tag">CASA0015 · Mobile Systems 2026</span>
+
+        <h1>Every plant is a chapter.</h1>
+
+        <p class="lead">
+          UrbanFlora turns every walk through the city into a citizen-science biodiversity log.
+          Snap a plant, choose from three ML candidates, and grow a personal codex enriched with
+          GPS, compass heading and live weather context.
+        </p>
+
+        <div class="cta">
+          <a class="btn primary" href="https://github.com/ChengJu1/UrbanFlora">View on GitHub →</a>
+          <a class="btn ghost" href="#screens">View app screens</a>
+        </div>
+
+        <div class="mini-stats" aria-label="Project highlights">
+          <div class="stat">
+            <b>3</b>
+            <span>ML candidates per scan</span>
+          </div>
+          <div class="stat">
+            <b>4</b>
+            <span>Daily interaction stages</span>
+          </div>
+          <div class="stat">
+            <b>6+</b>
+            <span>Connected app services</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="phone-wrap" aria-hidden="true">
+        <div class="phone">
+          <div class="screen">
+            <img src="screenshots/06_home.jpg" alt="UrbanFlora home screen">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="features">
+      <h2 class="section-title">What makes it different</h2>
+      <p class="section-sub">
+        UrbanFlora combines mobile sensing, plant recognition and light gamification to make everyday urban biodiversity more visible.
+      </p>
+
+      <div class="grid">
+        <article class="card">
+          <div class="icon">✦</div>
+          <h3>Sensor-native capture</h3>
+          <p>Camera, GPS, compass and current weather are woven into each observation without extra manual input.</p>
+        </article>
+
+        <article class="card">
+          <div class="icon">◎</div>
+          <h3>ML you can correct</h3>
+          <p>Pl@ntNet returns three species candidates with confidence scores, but the user still makes the final choice.</p>
+        </article>
+
+        <article class="card">
+          <div class="icon">❀</div>
+          <h3>A codex, not a feed</h3>
+          <p>Finds are grouped by botanical family, turning repeated observations into a growing personal field guide.</p>
+        </article>
+
+        <article class="card">
+          <div class="icon">↻</div>
+          <h3>Meaningful streaks</h3>
+          <p>A custom streak ring rewards daily noticing. It encourages return visits without making the app feel noisy.</p>
+        </article>
+
+        <article class="card">
+          <div class="icon">✉</div>
+          <h3>Daily digest</h3>
+          <p>A calm end-of-day summary shows species, families and rare finds as mini-stories rather than push spam.</p>
+        </article>
+
+        <article class="card">
+          <div class="icon">▲</div>
+          <h3>Cloud-synced data</h3>
+          <p>Firebase Auth and Firestore keep the codex available across devices, with scope for later data export.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="how">
+      <h2 class="section-title">How it works</h2>
+      <p class="section-sub">The core experience is designed around a simple daily loop.</p>
+
+      <div class="grid steps">
+        <article class="card" data-step="1">
+          <h3>Notice</h3>
+          <p>Onboarding encourages users to pay attention to plants during ordinary city walks.</p>
+        </article>
+
+        <article class="card" data-step="2">
+          <h3>Identify</h3>
+          <p>Pl@ntNet returns the top three likely species, supported by confidence scores.</p>
+        </article>
+
+        <article class="card" data-step="3">
+          <h3>Collect</h3>
+          <p>The selected plant is saved into the user’s codex with location and environmental context.</p>
+        </article>
+
+        <article class="card" data-step="4">
+          <h3>Reflect</h3>
+          <p>The evening digest summarises what the user discovered and encourages another walk.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="screens">
+      <h2 class="section-title">App screens</h2>
+      <p class="section-sub">
+        Real screens from the UrbanFlora prototype, showing the core user flow from onboarding to identification, collection and reflection.
+      </p>
+
+      <div class="screens-grid">
+        <div class="shot">
+          <img src="screenshots/02_onboarding_a.jpg" alt="UrbanFlora onboarding screen">
+        </div>
+        <div class="shot">
+          <img src="screenshots/06_home.jpg" alt="UrbanFlora home screen">
+        </div>
+        <div class="shot">
+          <img src="screenshots/07_camera.jpg" alt="UrbanFlora camera screen">
+        </div>
+        <div class="shot">
+          <img src="screenshots/08_identify.jpg" alt="UrbanFlora identify screen">
+        </div>
+        <div class="shot">
+          <img src="screenshots/10_detail.jpg" alt="UrbanFlora plant detail screen">
+        </div>
+        <div class="shot">
+          <img src="screenshots/11_digest.jpg" alt="UrbanFlora daily digest screen">
+        </div>
+        <div class="shot">
+          <img src="screenshots/12_map_mine.jpg" alt="UrbanFlora personal map screen">
+        </div>
+        <div class="shot">
+          <img src="screenshots/13_map_community.jpg" alt="UrbanFlora community map screen">
+        </div>
+        <div class="shot">
+          <img src="screenshots/14_codex.jpg" alt="UrbanFlora codex screen">
+        </div>
+        <div class="shot">
+          <img src="screenshots/15_settings.jpg" alt="UrbanFlora settings screen">
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="storyboard">
+        <div>
+          <h2 class="section-title">From city walk to field note</h2>
+          <p class="section-sub" style="margin-bottom: 0;">
+            The storyboard frames UrbanFlora as a lightweight noticing tool: a plant is seen, captured, identified and saved as part of a growing personal record.
+          </p>
+        </div>
+
+        <img src="screenshots/storyboard_concept.png" alt="UrbanFlora storyboard concept">
+      </div>
+    </section>
+
+    <section>
+      <h2 class="section-title">Under the hood</h2>
+      <p class="section-sub">
+        UrbanFlora connects mobile UI, cloud storage, plant identification and environmental context services.
+      </p>
+
+      <div class="tech">
+        <span>Flutter 3.24</span>
+        <span>Dart 3.5</span>
+        <span>Riverpod</span>
+        <span>go_router</span>
+        <span>Firebase Auth</span>
+        <span>Cloud Firestore</span>
+        <span>Firebase Storage</span>
+        <span>Pl@ntNet API</span>
+        <span>OpenWeatherMap</span>
+        <span>flutter_map + OSM</span>
+        <span>Material 3</span>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap footer-inner">
+      <div>Built for UCL CASA0015. MIT licensed. © 2026.</div>
+      <a href="https://github.com/ChengJu1/UrbanFlora">GitHub →</a>
+    </div>
+  </footer>
+</body>
+</html>

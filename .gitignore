@@ -57,3 +57,7 @@ firebase_options.dart.user
 **/service-account*.json
 .env
 .env.*
+
+# local notes, not for the public repo
+docs/submission_guide.md
+docs/talking_script.md
