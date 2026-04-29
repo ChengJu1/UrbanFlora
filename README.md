@@ -10,16 +10,7 @@ keep you coming back, and a map plus a family-grouped codex let you browse
 what you've collected so far. Everything lives in your own Firebase, so the
 data is yours.
 
-[Landing page](docs/index.html) · [Storyboard](docs/storyboard.md) ·
-[Personas](docs/personas.md) · [User testing plan](docs/user_testing_plan.md)
-
-## Storyboard
-
-<p align="center">
-  <img src="docs/screenshots/storyboard_concept.png" width="640" alt="UrbanFlora storyboard concept">
-</p>
-
-<p align="center"><sub><i>Concept illustration generated with Google Gemini.</i></sub></p>
+[Landing page](docs/index.html)
 
 ## Why
 
