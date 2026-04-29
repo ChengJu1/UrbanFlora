@@ -28,11 +28,200 @@
     "description": "Nitrogen-fixing legume, critical to pollinators in urban lawns."
   },
   {
+    "scientificName": "Plantago major",
+    "commonName": "Greater plantain",
+    "family": "Plantaginaceae",
+    "rarity": "common",
+    "description": "Tough rosette weed that thrives on trampled paths and pavement edges."
+  },
+  {
+    "scientificName": "Plantago lanceolata",
+    "commonName": "Ribwort plantain",
+    "family": "Plantaginaceae",
+    "rarity": "common",
+    "description": "Slim, ribbed leaves and a black-purple flower spike on a long stem."
+  },
+  {
+    "scientificName": "Hedera helix",
+    "commonName": "Common ivy",
+    "family": "Araliaceae",
+    "rarity": "common",
+    "description": "Evergreen climber that flowers late and feeds insects in autumn."
+  },
+  {
+    "scientificName": "Senecio vulgaris",
+    "commonName": "Groundsel",
+    "family": "Asteraceae",
+    "rarity": "common",
+    "description": "Soft, jagged-leaved annual with small yellow disc-only flower heads."
+  },
+  {
+    "scientificName": "Capsella bursa-pastoris",
+    "commonName": "Shepherd's purse",
+    "family": "Brassicaceae",
+    "rarity": "common",
+    "description": "Recognised by its triangular, heart-shaped seed pods."
+  },
+  {
+    "scientificName": "Stellaria media",
+    "commonName": "Common chickweed",
+    "family": "Caryophyllaceae",
+    "rarity": "common",
+    "description": "Sprawling annual with tiny white star-shaped flowers; a classic urban weed."
+  },
+  {
+    "scientificName": "Ranunculus repens",
+    "commonName": "Creeping buttercup",
+    "family": "Ranunculaceae",
+    "rarity": "common",
+    "description": "Spreads by runners across damp grass; glossy yellow five-petal flowers."
+  },
+  {
+    "scientificName": "Sonchus oleraceus",
+    "commonName": "Common sowthistle",
+    "family": "Asteraceae",
+    "rarity": "common",
+    "description": "Tall, leafy annual with pale yellow flower heads and milky sap."
+  },
+  {
+    "scientificName": "Cirsium vulgare",
+    "commonName": "Spear thistle",
+    "family": "Asteraceae",
+    "rarity": "common",
+    "description": "Bristly, sharply spined biennial; a magnet for bumblebees in summer."
+  },
+  {
+    "scientificName": "Buddleja davidii",
+    "commonName": "Butterfly bush",
+    "family": "Scrophulariaceae",
+    "rarity": "common",
+    "description": "Self-seeding shrub on walls and railway sidings; a magnet for butterflies."
+  },
+  {
+    "scientificName": "Veronica chamaedrys",
+    "commonName": "Germander speedwell",
+    "family": "Plantaginaceae",
+    "rarity": "common",
+    "description": "Tiny bright-blue flowers with a white eye, scattered through spring lawns."
+  },
+  {
+    "scientificName": "Lamium album",
+    "commonName": "White dead-nettle",
+    "family": "Lamiaceae",
+    "rarity": "common",
+    "description": "Looks like a stinging nettle but does not sting; helmet-shaped white flowers."
+  },
+  {
+    "scientificName": "Lolium perenne",
+    "commonName": "Perennial ryegrass",
+    "family": "Poaceae",
+    "rarity": "common",
+    "description": "The default lawn grass across most of urban Britain."
+  },
+  {
+    "scientificName": "Acer pseudoplatanus",
+    "commonName": "Sycamore",
+    "family": "Sapindaceae",
+    "rarity": "common",
+    "description": "Fast-growing maple; produces winged 'helicopter' seeds in autumn."
+  },
+  {
+    "scientificName": "Quercus robur",
+    "commonName": "English oak",
+    "family": "Fagaceae",
+    "rarity": "common",
+    "description": "Long-lived native; supports more insect species than any other UK tree."
+  },
+  {
+    "scientificName": "Aesculus hippocastanum",
+    "commonName": "Horse chestnut",
+    "family": "Sapindaceae",
+    "rarity": "common",
+    "description": "Familiar park tree; large palmate leaves and conkers in autumn."
+  },
+  {
+    "scientificName": "Sambucus nigra",
+    "commonName": "Common elder",
+    "family": "Adoxaceae",
+    "rarity": "common",
+    "description": "Cream flower-heads in early summer, dark berries by late summer."
+  },
+  {
+    "scientificName": "Crataegus monogyna",
+    "commonName": "Common hawthorn",
+    "family": "Rosaceae",
+    "rarity": "common",
+    "description": "Thorny hedgerow shrub; white spring blossom and red haws in autumn."
+  },
+  {
     "scientificName": "Geranium robertianum",
     "commonName": "Herb-Robert",
     "family": "Geraniaceae",
     "rarity": "uncommon",
     "description": "Reddish-stemmed street-crack inhabitant with a distinctive musky scent."
+  },
+  {
+    "scientificName": "Magnolia grandiflora",
+    "commonName": "Southern magnolia",
+    "family": "Magnoliaceae",
+    "rarity": "uncommon",
+    "description": "Evergreen ornamental tree with large, fragrant cream flowers."
+  },
+  {
+    "scientificName": "Wisteria sinensis",
+    "commonName": "Chinese wisteria",
+    "family": "Fabaceae",
+    "rarity": "uncommon",
+    "description": "Vigorous climber; cascading lilac panicles cover Edwardian terraces in May."
+  },
+  {
+    "scientificName": "Rosa canina",
+    "commonName": "Dog rose",
+    "family": "Rosaceae",
+    "rarity": "uncommon",
+    "description": "Native climbing rose of hedgerows; pale-pink summer flowers, scarlet hips later."
+  },
+  {
+    "scientificName": "Prunus serrulata",
+    "commonName": "Japanese cherry",
+    "family": "Rosaceae",
+    "rarity": "uncommon",
+    "description": "Ornamental street tree; spectacular, very short-lived spring blossom."
+  },
+  {
+    "scientificName": "Lavandula angustifolia",
+    "commonName": "English lavender",
+    "family": "Lamiaceae",
+    "rarity": "uncommon",
+    "description": "Aromatic dwarf shrub; the silvery-green and purple staple of front gardens."
+  },
+  {
+    "scientificName": "Lonicera periclymenum",
+    "commonName": "Common honeysuckle",
+    "family": "Caprifoliaceae",
+    "rarity": "uncommon",
+    "description": "Native woody climber; cream and pink trumpet flowers, strongest scent at dusk."
+  },
+  {
+    "scientificName": "Centaurea cyanus",
+    "commonName": "Cornflower",
+    "family": "Asteraceae",
+    "rarity": "uncommon",
+    "description": "Once a common cornfield weed, now mainly seen in deliberate wildflower mixes."
+  },
+  {
+    "scientificName": "Echium vulgare",
+    "commonName": "Viper's bugloss",
+    "family": "Boraginaceae",
+    "rarity": "uncommon",
+    "description": "Bristly biennial with brilliant blue flowers; loved by long-tongued bees."
+  },
+  {
+    "scientificName": "Helleborus niger",
+    "commonName": "Christmas rose",
+    "family": "Ranunculaceae",
+    "rarity": "uncommon",
+    "description": "Garden perennial that flowers in deep winter, often through frost."
   },
   {
     "scientificName": "Digitalis purpurea",
@@ -42,10 +231,73 @@
     "description": "Tall spire of tubular flowers; highly toxic, medicinally important."
   },
   {
+    "scientificName": "Hyacinthoides non-scripta",
+    "commonName": "Native bluebell",
+    "family": "Asparagaceae",
+    "rarity": "rare",
+    "description": "Drooping one-sided flower spikes; carpets ancient woodland in late spring."
+  },
+  {
+    "scientificName": "Primula vulgaris",
+    "commonName": "Primrose",
+    "family": "Primulaceae",
+    "rarity": "rare",
+    "description": "Pale-yellow rosette flower of hedge banks; one of the earliest spring blooms."
+  },
+  {
+    "scientificName": "Anemone nemorosa",
+    "commonName": "Wood anemone",
+    "family": "Ranunculaceae",
+    "rarity": "rare",
+    "description": "White six-petalled flower of ancient woodlands; an indicator of old habitat."
+  },
+  {
+    "scientificName": "Allium ursinum",
+    "commonName": "Wild garlic",
+    "family": "Amaryllidaceae",
+    "rarity": "rare",
+    "description": "Strong garlic smell when crushed; broad leaves and white star-shaped flowers."
+  },
+  {
+    "scientificName": "Fritillaria meleagris",
+    "commonName": "Snake's head fritillary",
+    "family": "Liliaceae",
+    "rarity": "rare",
+    "description": "Drooping, chequered purple bell flower of damp meadows."
+  },
+  {
     "scientificName": "Orchis mascula",
     "commonName": "Early purple orchid",
     "family": "Orchidaceae",
     "rarity": "legendary",
     "description": "A rare sight in urban settings; appears briefly in spring."
+  },
+  {
+    "scientificName": "Anacamptis pyramidalis",
+    "commonName": "Pyramidal orchid",
+    "family": "Orchidaceae",
+    "rarity": "legendary",
+    "description": "Bright pink pyramid-shaped flower head; favours chalk and limestone."
+  },
+  {
+    "scientificName": "Ophrys apifera",
+    "commonName": "Bee orchid",
+    "family": "Orchidaceae",
+    "rarity": "legendary",
+    "description": "Flowers mimic the look of a female bee, including the fuzz; usually self-pollinates in the UK."
+  },
+  {
+    "scientificName": "Dactylorhiza fuchsii",
+    "commonName": "Common spotted orchid",
+    "family": "Orchidaceae",
+    "rarity": "legendary",
+    "description": "Pink-purple flower spike with a spotted lip; a quietly common orchid."
+  },
+  {
+    "scientificName": "Cypripedium calceolus",
+    "commonName": "Lady's slipper orchid",
+    "family": "Orchidaceae",
+    "rarity": "legendary",
+    "description": "Yellow, pouch-shaped flower; Britain's most endangered orchid, almost extinct in the wild."
   }
 ]

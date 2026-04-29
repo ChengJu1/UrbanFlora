@@ -1,3 +1,5 @@
+import '../services/species_catalog.dart';
+
 /// Rarity tiers used by badges and pin colours.
 enum Rarity { common, uncommon, rare, legendary }
 
@@ -67,11 +69,11 @@ class SpeciesCandidate {
         score: (map['score'] as num?)?.toDouble() ?? 0,
       );
 
-  // simple rule: low confidence = rare plant
-  Rarity get rarity {
-    if (score > 0.85) return Rarity.common;
-    if (score > 0.6) return Rarity.uncommon;
-    if (score > 0.35) return Rarity.rare;
-    return Rarity.legendary;
-  }
+  // rarity comes from the seeded species catalog: an orchid stays rare
+  // even when Pl@ntNet is super confident, and a clear shot of a daisy
+  // does not turn it "legendary" just because the score is low.
+  Rarity get rarity => SpeciesCatalog.instance.rarityFor(
+        scientificName: scientificName,
+        family: family,
+      );
 }
