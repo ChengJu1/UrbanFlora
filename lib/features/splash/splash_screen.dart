@@ -4,6 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../core/constants/app_constants.dart';
 import '../../core/router/app_router.dart';
 
 /// Brief animated splash that decides where to send the user next:
@@ -16,8 +17,6 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  static const _onboardedKey = 'has_onboarded_v1';
-
   @override
   void initState() {
     super.initState();
@@ -28,7 +27,7 @@ class _SplashScreenState extends State<SplashScreen> {
     await Future<void>.delayed(const Duration(milliseconds: 1800));
     if (!mounted) return;
     final prefs = await SharedPreferences.getInstance();
-    final hasOnboarded = prefs.getBool(_onboardedKey) ?? false;
+    final hasOnboarded = prefs.getBool(AppConstants.onboardedKey) ?? false;
     final user = _persistedUser();
     if (!mounted) return;
 

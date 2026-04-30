@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../constants/app_constants.dart';
 import '../models/public_sighting.dart';
 import '../models/species.dart';
 import 'auth_service.dart';
@@ -25,7 +26,6 @@ class NearbyRareWatcher {
   final NotificationsService notifications;
   final String uid;
 
-  static const double _maxDistanceMeters = 10000; // 10 km radius
   static const String _notifiedKey = 'rare_notified_ids';
 
   StreamSubscription<List<PublicSighting>>? _sub;
@@ -99,7 +99,7 @@ class NearbyRareWatcher {
         s.latitude,
         s.longitude,
       );
-      if (m > _maxDistanceMeters) return;
+      if (m > AppConstants.communityRadiusMetres) return;
       distLabel = m < 1000
           ? ' • ${m.round()} m away'
           : ' • ${(m / 1000).toStringAsFixed(1)} km away';

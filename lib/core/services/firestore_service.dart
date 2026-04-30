@@ -135,11 +135,6 @@ class FirestoreService {
     await _publicSightings().doc(sighting.id).set(sighting.toMap());
   }
 
-  /// Take a sighting back off the community map.
-  Future<void> retractSighting(String observationId) async {
-    await _publicSightings().doc(observationId).delete();
-  }
-
   /// Watch recent community sightings from everyone.
   Stream<List<PublicSighting>> recentPublicSightings({int limit = 200}) {
     return _publicSightings()

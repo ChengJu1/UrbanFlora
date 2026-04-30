@@ -44,7 +44,7 @@ class StreakRing extends StatelessWidget {
               ),
               const SizedBox(height: 2),
               Text(
-                streak == 1 ? 'day streak' : 'day streak',
+                streak == 1 ? 'day streak' : 'days streak',
                 style: Theme.of(context).textTheme.labelMedium?.copyWith(
                       color: scheme.onSurfaceVariant,
                       letterSpacing: 1.2,

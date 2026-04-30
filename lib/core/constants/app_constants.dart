@@ -2,9 +2,6 @@
 class AppConstants {
   const AppConstants._();
 
-  static const String appName = 'UrbanFlora';
-  static const String tagline = 'Every plant is a chapter.';
-
   static const String plantNetEndpoint =
       'https://my-api.plantnet.org/v2/identify/the-plant-list';
 
@@ -13,7 +10,6 @@ class AppConstants {
 
   static const String usersCollection = 'users';
   static const String observationsCollection = 'observations';
-  static const String speciesCollection = 'species';
   static const String publicSightingsCollection = 'public_sightings';
 
   // round coords to ~10 m for privacy
@@ -21,4 +17,6 @@ class AppConstants {
 
   // 10 km
   static const double communityRadiusMetres = 10000;
+
+  static const String onboardedKey = 'has_onboarded_v1';
 }

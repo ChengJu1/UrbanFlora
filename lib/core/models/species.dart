@@ -64,7 +64,7 @@ class SpeciesCandidate {
   factory SpeciesCandidate.fromMap(Map<String, dynamic> map) => SpeciesCandidate(
         scientificName: map['scientificName'] as String? ?? 'Unknown',
         commonName: map['commonName'] as String? ?? 'No common name',
-        family: map['family'] as String? ?? 'Unknown',
+        family: map['family'] as String? ?? 'Unknown family',
         genus: map['genus'] as String?,
         score: (map['score'] as num?)?.toDouble() ?? 0,
       );

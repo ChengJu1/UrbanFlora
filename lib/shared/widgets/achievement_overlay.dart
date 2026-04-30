@@ -5,7 +5,6 @@ import 'package:flutter_animate/flutter_animate.dart';
 
 import '../../core/models/species.dart';
 
-/// Animated celebration sheet shown briefly after a badge is unlocked.
 class AchievementOverlay {
   const AchievementOverlay._();
 
@@ -14,7 +13,6 @@ class AchievementOverlay {
     required String commonName,
     required String scientificName,
     required Rarity rarity,
-    bool isNewSpecies = true,
   }) {
     return Navigator.of(context).push<void>(
       PageRouteBuilder<void>(
@@ -26,7 +24,6 @@ class AchievementOverlay {
           commonName: commonName,
           scientificName: scientificName,
           rarity: rarity,
-          isNewSpecies: isNewSpecies,
         ),
       ),
     );
@@ -38,13 +35,11 @@ class _AchievementView extends StatefulWidget {
     required this.commonName,
     required this.scientificName,
     required this.rarity,
-    required this.isNewSpecies,
   });
 
   final String commonName;
   final String scientificName;
   final Rarity rarity;
-  final bool isNewSpecies;
 
   @override
   State<_AchievementView> createState() => _AchievementViewState();
@@ -102,9 +97,7 @@ class _AchievementViewState extends State<_AchievementView>
                       ),
                       child: Center(
                         child: Icon(
-                          widget.isNewSpecies
-                              ? Icons.auto_awesome
-                              : Icons.eco,
+                          Icons.auto_awesome,
                           color: color,
                           size: 56,
                         ),
@@ -122,7 +115,7 @@ class _AchievementViewState extends State<_AchievementView>
                     .fadeIn(),
                 const SizedBox(height: 16),
                 Text(
-                  widget.isNewSpecies ? 'New species!' : 'Logged',
+                  'New species!',
                   style: Theme.of(context).textTheme.labelLarge?.copyWith(
                         letterSpacing: 2,
                         color: color,
